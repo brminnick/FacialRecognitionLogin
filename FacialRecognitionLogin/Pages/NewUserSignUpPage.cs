@@ -6,10 +6,10 @@ using EntryCustomReturn.Forms.Plugin.Abstractions;
 
 namespace FacialRecognitionLogin
 {
-    public class NewUserSignUpPage : ContentPage
+    public class NewUserSignUpPage : BaseContentPage<NewUserSignUpViewModel>
     {
-        #region Fields
-        readonly StyledButton _saveUsernameButton, _cancelButton;
+        #region Constant Fields
+        readonly StyledButton _saveUsernameButton, _cancelButton, _takePhotoButton;
         readonly StyledEntry _usernameEntry, _passwordEntry;
         readonly StackLayout _layout;
         #endregion
@@ -32,6 +32,7 @@ namespace FacialRecognitionLogin
                 HorizontalTextAlignment = TextAlignment.End,
                 PlaceholderColor = Color.FromHex("749FA8"),
             };
+            _usernameEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
             CustomReturnEffect.SetReturnType(_usernameEntry, ReturnType.Next);
             CustomReturnEffect.SetReturnCommand(_usernameEntry, new Command(() => _passwordEntry.Focus()));
 
@@ -44,6 +45,7 @@ namespace FacialRecognitionLogin
                 VerticalOptions = LayoutOptions.Fill,
                 PlaceholderColor = Color.FromHex("749FA8")
             };
+            _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
             CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Go);
             CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(() => HandleSaveUsernameButtonClicked(_saveUsernameButton, EventArgs.Empty)));
 
@@ -59,6 +61,13 @@ namespace FacialRecognitionLogin
                 Text = "Cancel",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.End
+            };
+
+            _takePhotoButton = new StyledButton(Borders.Thin, 1)
+            {
+                Text = "Take Photo",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.EndAndExpand
             };
 
             _layout.Children.Add(
@@ -79,6 +88,7 @@ namespace FacialRecognitionLogin
                 }
             );
             _layout.Children.Add(_passwordEntry);
+            _layout.Children.Add(_takePhotoButton);
             _layout.Children.Add(_saveUsernameButton);
             _layout.Children.Add(_cancelButton);
 
@@ -87,20 +97,20 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        protected override void OnAppearing()
+        protected override void SubscribeEventHandlers()
         {
-            base.OnAppearing();
-
             _cancelButton.Clicked += HandleCancelButtonClicked;
+			ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
+			PhotoHelpers.NoCameraDetected += HandleNoPhotoDetected;
             _saveUsernameButton.Clicked += HandleSaveUsernameButtonClicked;
         }
 
-        protected override void OnDisappearing()
+        protected override void UnsubscribeEventHandlers()
         {
-            base.OnDisappearing();
-
             _cancelButton.Clicked -= HandleCancelButtonClicked;
-            _saveUsernameButton.Clicked -= HandleSaveUsernameButtonClicked;
+            ViewModel.TakePhotoFailed -= HandleTakePhotoFailed;
+            PhotoHelpers.NoCameraDetected -= HandleNoPhotoDetected;
+			_saveUsernameButton.Clicked -= HandleSaveUsernameButtonClicked;
         }
 
         protected override void LayoutChildren(double x, double y, double width, double height)
@@ -111,9 +121,6 @@ namespace FacialRecognitionLogin
             base.LayoutChildren(x, y, width, height);
         }
 
-        void HandleCancelButtonClicked(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await Navigation.PopModalAsync());
-
         async void HandleSaveUsernameButtonClicked(object sender, EventArgs e)
         {
             var success = await DependencyService.Get<ILogin>().SetPasswordForUsername(_usernameEntry.Text, _passwordEntry.Text);
@@ -123,6 +130,15 @@ namespace FacialRecognitionLogin
             else
                 await DisplayAlert("Error", "You must enter a username and a password", "Okay");
         }
+
+        void HandleNoPhotoDetected(object sender, EventArgs e) =>
+            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Not Available", "OK"));
+
+        void HandleCancelButtonClicked(object sender, EventArgs e) =>
+            Device.BeginInvokeOnMainThread(async () => await Navigation.PopModalAsync());
+
+        void HandleTakePhotoFailed(object sender, string errorMessage) =>
+            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
         #endregion
 
         #region Classes
