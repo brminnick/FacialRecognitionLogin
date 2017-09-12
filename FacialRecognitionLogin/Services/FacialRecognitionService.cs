@@ -105,8 +105,12 @@ namespace FacialRecognitionLogin
 
         static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
         {
-            var baseNavigationPage = Application.Current.MainPage as NavigationPage;
-            var currentPage = baseNavigationPage.CurrentPage as ContentPage;
+            Page currentPage;
+            if (Application.Current.MainPage.Navigation.ModalStack.Any())
+                currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
+            else
+                currentPage = Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
+
             var currentViewModel = currentPage.BindingContext as BaseViewModel;
 
             if (isActivityIndicatorDisplayed)
@@ -116,8 +120,11 @@ namespace FacialRecognitionLogin
             }
             else
             {
-                if (--_networkIndicatorCount == 0)
+                if (--_networkIndicatorCount <= 0)
+                {
                     currentViewModel.IsInternetConnectionActive = false;
+                    _networkIndicatorCount = 0;
+                }
             }
         }
 
@@ -129,7 +136,7 @@ namespace FacialRecognitionLogin
             }
             catch (FaceAPIException e)
             {
-                if (!e.HttpStatus.Equals(System.Net.HttpStatusCode.Conflict))
+                if (!e.HttpStatus.Equals(HttpStatusCode.Conflict))
                     throw e;
             }
         }

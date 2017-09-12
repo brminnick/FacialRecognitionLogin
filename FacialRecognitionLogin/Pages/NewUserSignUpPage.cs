@@ -48,6 +48,7 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
+            _saveUsernameButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _saveUsernameButton.SetBinding(Button.CommandProperty, nameof(ViewModel.SaveButtonCommand));
 
             _cancelButton = new StyledButton(Borders.Thin, 1)
@@ -56,6 +57,7 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.End
             };
+            _cancelButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _cancelButton.SetBinding(Button.CommandProperty, nameof(ViewModel.CancelButtonCommand));
 
             _takePhotoButton = new StyledButton(Borders.Thin, 1)
@@ -64,19 +66,26 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
+            _takePhotoButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _takePhotoButton.SetBinding(Button.CommandProperty, nameof(ViewModel.TakePhotoButtonCommand));
 
             var isFacialRecognitionCompletedDescriptionLabel = new StyledLabel { Text = "Facial Recognition Completed" };
 
             var isFacialRecognitionCompletedLabel = new FontAwesomeIcon
             {
+                TextColor = Color.White,
                 VerticalTextAlignment = TextAlignment.Center,
-                HorizontalTextAlignment = TextAlignment.Center,
-                TextColor = Color.White
+                HorizontalTextAlignment = TextAlignment.Center
             };
+            isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
             isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(ViewModel.FontAwesomeLabelText));
 
-            var activityIndicator = new ActivityIndicator { Color = Color.White };
+            var activityIndicator = new ActivityIndicator
+            {
+                Color = Color.White,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.EndAndExpand,
+            };
             activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
             activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
 
@@ -110,8 +119,8 @@ namespace FacialRecognitionLogin
                         Children={
                             isFacialRecognitionCompletedDescriptionLabel,
                             isFacialRecognitionCompletedLabel,
+                            activityIndicator
                         }},
-					activityIndicator,
                     _saveUsernameButton,
                     _cancelButton
                 }

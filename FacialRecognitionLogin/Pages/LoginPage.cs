@@ -51,9 +51,11 @@ namespace FacialRecognitionLogin
             CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
 
             _loginButton = new StyledButton(Borders.Thin) { Text = "Login" };
+			_loginButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _loginButton.SetBinding(Button.CommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _newUserSignUpButton = new StyledButton(Borders.None) { Text = "Sign-up" };
+            _newUserSignUpButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
 
             var activityIndicator = new ActivityIndicator { Color = Color.White };
             activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));

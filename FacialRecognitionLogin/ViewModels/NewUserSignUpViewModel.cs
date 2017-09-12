@@ -39,7 +39,7 @@ namespace FacialRecognitionLogin
         public string UsernameEntryText
         {
             get => _usernameEntryText;
-            set => SetProperty(ref _usernameEntryText, value);
+            set => SetProperty(ref _usernameEntryText, value, () => FontAwesomeLabelText = _fontAwesomeEmptyBox.ToString());
         }
 
         public string PasswordEntryText
@@ -104,9 +104,13 @@ namespace FacialRecognitionLogin
 
         async Task ExecuteCancelButtonCommand()
         {
-            if(!_facialRecognitionUserGUID.Equals(default(Guid)))
+            await WaitForNewUserSignUpPageToDisappear();
+
+            if (!_facialRecognitionUserGUID.Equals(default(Guid)))
                 await FacialRecognitionService.RemoveFace(_facialRecognitionUserGUID);
         }
+
+        async Task WaitForNewUserSignUpPageToDisappear() => await Task.Delay(1000);
 
         void OnTakePhotoFailed(string errorMessage) =>
             TakePhotoFailed?.Invoke(this, errorMessage);

@@ -16,10 +16,12 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Properties
+        public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
+
         public bool IsInternetConnectionActive
         {
             get => _isInternetConnectionActive;
-            set => SetProperty(ref _isInternetConnectionActive, value);
+            set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
         }
         #endregion
 
