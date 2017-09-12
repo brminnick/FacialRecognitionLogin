@@ -10,7 +10,11 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Constructors
-        protected BaseContentPage() => BindingContext = ViewModel;
+        protected BaseContentPage()
+        {
+            BindingContext = ViewModel;
+            this.SetBinding(IsBusyProperty, nameof(ViewModel.IsInternetConnectionActive));
+        }
         #endregion
 
         #region Properties

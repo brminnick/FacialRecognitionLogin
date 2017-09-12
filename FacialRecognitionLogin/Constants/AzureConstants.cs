@@ -2,6 +2,6 @@
 {
     public static class AzureConstants
     {
-        public const string FacialRecognitionAPIKey = "814e922bb4ef4e1188e119d46b204fbf";
+        public const string FacialRecognitionAPIKey = "1034a4230bee4c6d962032cf5ce82766";
     }
 }

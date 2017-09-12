@@ -11,21 +11,14 @@ namespace FacialRecognitionLogin
         #region Constant Fields
         readonly StyledButton _saveUsernameButton, _cancelButton, _takePhotoButton;
         readonly StyledEntry _usernameEntry, _passwordEntry;
-        readonly StackLayout _layout;
         #endregion
 
         #region Constructos
         public NewUserSignUpPage()
         {
-            BackgroundColor = Color.FromHex("#2980b9");
+            BackgroundColor = Color.FromHex("2980b9");
 
-            _layout = new StackLayout
-            {
-                Padding = new Thickness(20, 50, 20, 20),
-                VerticalOptions = LayoutOptions.FillAndExpand,
-            };
-
-            _usernameEntry = new UnderlinedEntry(1)
+            _usernameEntry = new StyledEntry(1)
             {
                 Placeholder = "Username",
                 HorizontalOptions = LayoutOptions.Fill,
@@ -36,7 +29,7 @@ namespace FacialRecognitionLogin
             CustomReturnEffect.SetReturnType(_usernameEntry, ReturnType.Next);
             CustomReturnEffect.SetReturnCommand(_usernameEntry, new Command(() => _passwordEntry.Focus()));
 
-            _passwordEntry = new UnderlinedEntry(1)
+            _passwordEntry = new StyledEntry(1)
             {
                 Placeholder = "Password",
                 IsPassword = true,
@@ -46,22 +39,24 @@ namespace FacialRecognitionLogin
                 PlaceholderColor = Color.FromHex("749FA8")
             };
             _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
-            CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Go);
-            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(() => HandleSaveUsernameButtonClicked(_saveUsernameButton, EventArgs.Empty)));
+            CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
+            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(Unfocus));
 
-            _saveUsernameButton = new BorderedButton(Borders.Thin, 1)
+            _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
                 Text = "Save Username",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
+            _saveUsernameButton.SetBinding(Button.CommandProperty, nameof(ViewModel.SaveButtonCommand));
 
-            _cancelButton = new BorderedButton(Borders.Thin, 1)
+            _cancelButton = new StyledButton(Borders.Thin, 1)
             {
                 Text = "Cancel",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.End
             };
+            _cancelButton.SetBinding(Button.CommandProperty, nameof(ViewModel.CancelButtonCommand));
 
             _takePhotoButton = new StyledButton(Borders.Thin, 1)
             {
@@ -69,67 +64,107 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
+            _takePhotoButton.SetBinding(Button.CommandProperty, nameof(ViewModel.TakePhotoButtonCommand));
 
-            _layout.Children.Add(
-                new Label
-                {
-                    Text = "Please enter username",
-                    TextColor = Color.White,
-                    HorizontalOptions = LayoutOptions.Start
-                }
-            );
-            _layout.Children.Add(_usernameEntry);
-            _layout.Children.Add(
-                new Label
-                {
-                    Text = "Please enter password",
-                    TextColor = Color.White,
-                    HorizontalOptions = LayoutOptions.Start
-                }
-            );
-            _layout.Children.Add(_passwordEntry);
-            _layout.Children.Add(_takePhotoButton);
-            _layout.Children.Add(_saveUsernameButton);
-            _layout.Children.Add(_cancelButton);
+            var isFacialRecognitionCompletedDescriptionLabel = new StyledLabel { Text = "Facial Recognition Completed" };
 
-            Content = new ScrollView { Content = _layout };
+            var isFacialRecognitionCompletedLabel = new FontAwesomeIcon
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                TextColor = Color.White
+            };
+            isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(ViewModel.FontAwesomeLabelText));
+
+            var activityIndicator = new ActivityIndicator { Color = Color.White };
+            activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
+            activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
+
+            var stackLayout = new StackLayout
+            {
+                Padding = new Thickness(20, 50, 20, 20),
+                VerticalOptions = LayoutOptions.FillAndExpand,
+
+                Children ={
+                    new Label
+                    {
+                        Text = "Please enter username",
+                        TextColor = Color.White,
+                        HorizontalOptions = LayoutOptions.Start
+                    },
+
+                    _usernameEntry,
+
+                    new Label
+                    {
+                        Text = "Please enter password",
+                        TextColor = Color.White,
+                        HorizontalOptions = LayoutOptions.Start
+                    },
+
+                    _passwordEntry,
+                    _takePhotoButton,
+                    new StackLayout{
+                        Orientation = StackOrientation.Horizontal,
+                        HorizontalOptions = LayoutOptions.Center,
+                        Children={
+                            isFacialRecognitionCompletedDescriptionLabel,
+                            isFacialRecognitionCompletedLabel,
+                        }},
+					activityIndicator,
+                    _saveUsernameButton,
+                    _cancelButton
+                }
+            };
+
+            Content = new ScrollView { Content = stackLayout };
         }
         #endregion
 
         #region Methods
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            Device.BeginInvokeOnMainThread(() => _usernameEntry.Focus());
+        }
+
         protected override void SubscribeEventHandlers()
         {
+            ViewModel.SaveFailed += HandleSaveFailed;
             _cancelButton.Clicked += HandleCancelButtonClicked;
-			ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
-			PhotoHelpers.NoCameraDetected += HandleNoPhotoDetected;
-            _saveUsernameButton.Clicked += HandleSaveUsernameButtonClicked;
+            ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
+            PhotoHelpers.NoCameraDetected += HandleNoPhotoDetected;
+            ViewModel.SaveSuccessfullyCompleted += HandleSaveSuccessfullyCompleted;
         }
 
         protected override void UnsubscribeEventHandlers()
         {
+            ViewModel.SaveFailed -= HandleSaveFailed;
             _cancelButton.Clicked -= HandleCancelButtonClicked;
             ViewModel.TakePhotoFailed -= HandleTakePhotoFailed;
             PhotoHelpers.NoCameraDetected -= HandleNoPhotoDetected;
-			_saveUsernameButton.Clicked -= HandleSaveUsernameButtonClicked;
+            ViewModel.SaveSuccessfullyCompleted -= HandleSaveSuccessfullyCompleted;
         }
 
         protected override void LayoutChildren(double x, double y, double width, double height)
         {
             _cancelButton.WidthRequest = width - 40;
             _saveUsernameButton.WidthRequest = width - 40;
+            _takePhotoButton.WidthRequest = width - 40;
 
             base.LayoutChildren(x, y, width, height);
         }
 
-        async void HandleSaveUsernameButtonClicked(object sender, EventArgs e)
-        {
-            var success = await DependencyService.Get<ILogin>().SetPasswordForUsername(_usernameEntry.Text, _passwordEntry.Text);
-
-            if (success)
+        void HandleSaveSuccessfullyCompleted(object sender, EventArgs e) =>
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                await DisplayAlert("Success", "New User Created", "OK");
                 await Navigation.PopModalAsync();
-            else
-                await DisplayAlert("Error", "You must enter a username and a password", "Okay");
-        }
+            });
+
+        void HandleSaveFailed(object sender, string errorMessage) =>
+            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
 
         void HandleNoPhotoDetected(object sender, EventArgs e) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Not Available", "OK"));
@@ -139,30 +174,6 @@ namespace FacialRecognitionLogin
 
         void HandleTakePhotoFailed(object sender, string errorMessage) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
-        #endregion
-
-        #region Classes
-        class BorderedButton : StyledButton
-        {
-            public BorderedButton(Borders border, double opacity) : base(border, opacity)
-            {
-                BorderRadius = 3;
-                TextColor = Color.White;
-                BorderColor = Color.White;
-                BorderWidth = 1;
-            }
-        }
-
-        class UnderlinedEntry : StyledEntry
-        {
-            public UnderlinedEntry(double opacity) : base(opacity)
-            {
-                BackgroundColor = Color.Transparent;
-                HeightRequest = 40;
-                TextColor = Color.White;
-                PlaceholderColor = Color.White;
-            }
-        }
         #endregion
     }
 }

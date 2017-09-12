@@ -17,7 +17,7 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Event
-        public event EventHandler<string> LoginFailed;
+        public event EventHandler<LoginFailedEventArgs> LoginFailed;
         public event EventHandler LoginApproved;
         #endregion
 
@@ -43,11 +43,17 @@ namespace FacialRecognitionLogin
         {
             if (string.IsNullOrWhiteSpace(UsernameEntryText) || string.IsNullOrWhiteSpace(PasswordEntryText))
             {
-                OnLoginFailed("Username and Password cannot be empty");
+                OnLoginFailed("Username and Password cannot be empty", false);
                 return;
             }
 
             var isUsernamePasswordCorrect = await DependencyService.Get<ILogin>().CheckLogin(UsernameEntryText, PasswordEntryText);
+
+            if (!isUsernamePasswordCorrect)
+            {
+                OnLoginFailed("Username / Password Invalid", true);
+                return;
+            }
 
             var photoStream = await PhotoHelpers.GetPhotoStreamFromCamera();
 
@@ -56,11 +62,11 @@ namespace FacialRecognitionLogin
             if (isFaceRecognized)
                 OnLoginApproved();
             else
-                OnLoginFailed("Face not recognized");
+                OnLoginFailed("Face not recognized", true);
         }
 
-        void OnLoginFailed(string errorMessage) =>
-            LoginFailed?.Invoke(this, errorMessage);
+        void OnLoginFailed(string errorMessage, bool shouldDisplaySignUpPrompt) =>
+            LoginFailed?.Invoke(this, new LoginFailedEventArgs(errorMessage,shouldDisplaySignUpPrompt));
 
         void OnLoginApproved() =>
             LoginApproved?.Invoke(this, EventArgs.Empty);

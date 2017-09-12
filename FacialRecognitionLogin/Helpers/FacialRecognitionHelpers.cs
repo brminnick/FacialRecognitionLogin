@@ -3,14 +3,21 @@ using Microsoft.ProjectOxford.Face;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using Xamarin.Forms;
+using System.Net;
+
 namespace FacialRecognitionLogin
 {
     public static class FacialRecognitionHelpers
     {
         #region Constant Fields
-        const string _personGroupId = "personGroupId";
-        const string _personGroupName = "Person Group Name";
+        const string _personGroupId = "persongroupid";
+        const string _personGroupName = "Facial Recognition Login Group";
         static readonly Lazy<FaceServiceClient> _faceServiceClientHolder = new Lazy<FaceServiceClient>(() => new FaceServiceClient(AzureConstants.FacialRecognitionAPIKey));
+        #endregion
+
+        #region Fields
+        static int _networkIndicatorCount = 0;
         #endregion
 
         #region Properties
@@ -18,30 +25,111 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        public static async Task AddNewFace(string username, Stream photo)
+        public static async Task RemoveFace(Guid userId)
         {
-            await FaceServiceClient.CreatePersonGroupAsync(_personGroupId, _personGroupName);
+            UpdateActivityIndicatorStatus(true);
+            try
+            {
+                await FaceServiceClient.DeletePersonAsync(_personGroupId, userId);
+            }
+            catch (FaceAPIException e)
+            {
+                if (!e.HttpStatus.Equals(HttpStatusCode.NotFound))
+                    throw e;
+            }
+            finally
+            {
+                UpdateActivityIndicatorStatus(false);
+            }
+        }
 
-            var personResult = await FaceServiceClient.CreatePersonAsync(_personGroupId, username);
+        public static async Task<Guid> AddNewFace(string username, Stream photo)
+        {
+            UpdateActivityIndicatorStatus(true);
 
-            var temp = await FaceServiceClient.AddPersonFaceAsync(_personGroupId, personResult.PersonId, photo);
+            try
+            {
+                await CreatePersonGroup();
+
+                var personResult = await FaceServiceClient.CreatePersonAsync(_personGroupId, username);
+
+                var faceResult = await FaceServiceClient.AddPersonFaceAsync(_personGroupId, personResult.PersonId, photo);
+
+                await FaceServiceClient.TrainPersonGroupAsync(_personGroupId);
+
+                return faceResult.PersistedFaceId;
+            }
+            finally
+            {
+                UpdateActivityIndicatorStatus(false);
+            }
         }
 
         public static async Task<bool> IsFaceIdentified(string username, Stream photo)
         {
-			var personListTask = FaceServiceClient.GetPersonsAsync(_personGroupId);
+            UpdateActivityIndicatorStatus(true);
+            try
+            {
+                var personListTask = FaceServiceClient.GetPersonsAsync(_personGroupId);
+                var faces = await FaceServiceClient.DetectAsync(photo);
+                var results = await FaceServiceClient.IdentifyAsync(_personGroupId, faces.Select(x => x.FaceId).ToArray());
 
-            var faces = await FaceServiceClient.DetectAsync(photo);
+                var candidateList = results.SelectMany(x => x.Candidates).ToList();
 
-            var results = await FaceServiceClient.IdentifyAsync(_personGroupId, faces.Select(x => x.FaceId).ToArray());
+                await personListTask;
 
-            var candidateList = results.SelectMany(x => x.Candidates).ToList();
+                var matchingUsernamePersonList = personListTask.Result.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
 
-            await personListTask;
+                //foreach (var candiate in candidateList)
+                //{
+                //    var isMatchFound = matchingUsernamePersonList.Select(x => x.PersonId).Contains(candiate.PersonId);
 
-            var submittedPerson = personListTask.Result.Where(x => x.Name.Equals(username)).FirstOrDefault();
+                //    if (isMatchFound)
+                //        return true;
+                //}
 
-            return candidateList.Any(x => x.PersonId.Equals(submittedPerson?.PersonId));
+                return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                UpdateActivityIndicatorStatus(false);
+            }
+        }
+
+        static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
+        {
+            var baseNavigationPage = Application.Current.MainPage as NavigationPage;
+            var currentPage = baseNavigationPage.CurrentPage as ContentPage;
+            var currentViewModel = currentPage.BindingContext as BaseViewModel;
+
+            if (isActivityIndicatorDisplayed)
+            {
+                currentViewModel.IsInternetConnectionActive = true;
+                _networkIndicatorCount++;
+            }
+            else
+            {
+                if (--_networkIndicatorCount == 0)
+                    currentViewModel.IsInternetConnectionActive = false;
+            }
+        }
+
+        static async Task CreatePersonGroup()
+        {
+            try
+            {
+                await FaceServiceClient.CreatePersonGroupAsync(_personGroupId, _personGroupName);
+            }
+            catch (FaceAPIException e)
+            {
+                if (!e.HttpStatus.Equals(System.Net.HttpStatusCode.Conflict))
+                    throw e;
+            }
         }
         #endregion
     }

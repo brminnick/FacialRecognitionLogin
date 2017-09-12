@@ -18,5 +18,7 @@
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Constants\" />
+    <Folder Include="CustomEventArgs\" />
+    <Folder Include="Views\Base\" />
   </ItemGroup>
 </Project>

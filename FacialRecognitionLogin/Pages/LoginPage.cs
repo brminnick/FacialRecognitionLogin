@@ -23,7 +23,7 @@ namespace FacialRecognitionLogin
         bool isInitialized = false;
         #endregion
 
-        #region Contrucotrs
+        #region Constructors
         public LoginPage()
         {
             BackgroundColor = Color.FromHex("#3498db");
@@ -47,17 +47,22 @@ namespace FacialRecognitionLogin
                 IsPassword = true,
             };
             _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+            _passwordEntry.SetBinding(CustomReturnEffect.ReturnCommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
             CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
-            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(Unfocus));
 
             _loginButton = new StyledButton(Borders.Thin) { Text = "Login" };
             _loginButton.SetBinding(Button.CommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _newUserSignUpButton = new StyledButton(Borders.None) { Text = "Sign-up" };
 
+            var activityIndicator = new ActivityIndicator { Color = Color.White };
+            activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
+            activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
 
             Func<RelativeLayout, double> getNewUserButtonWidth = (p) => _newUserSignUpButton.Measure(p.Width, p.Height).Request.Width;
             Func<RelativeLayout, double> getLogoSloganWidth = (p) => _logoSlogan.Measure(p.Width, p.Height).Request.Width;
+            Func<RelativeLayout, double> getActivityIndicatorHeight = (p) => activityIndicator.Measure(p.Width, p.Height).Request.Height;
+            Func<RelativeLayout, double> getActivityIndicatorWidth = (p) => activityIndicator.Measure(p.Width, p.Height).Request.Width;
 
             _relativeLayout = new RelativeLayout();
             _relativeLayout.Children.Add(
@@ -98,6 +103,10 @@ namespace FacialRecognitionLogin
                 yConstraint: Constraint.RelativeToView(_loginButton, (p, v) => v.Y + _loginButton.Height + 15)
             );
 
+            _relativeLayout.Children.Add(activityIndicator,
+                xConstraint: Constraint.RelativeToParent(parent => parent.Width / 2 - getActivityIndicatorWidth(parent) / 2),
+                yConstraint: Constraint.RelativeToParent(parent => parent.Height / 2 - getActivityIndicatorHeight(parent) / 2));
+
             Content = new ScrollView { Content = _relativeLayout };
         }
         #endregion
@@ -116,16 +125,18 @@ namespace FacialRecognitionLogin
 
         protected override void SubscribeEventHandlers()
         {
-			PhotoHelpers.NoCameraDetected += HandleNoCameraDetected;
+			ViewModel.LoginFailed += HandleLoginFailed;
+            ViewModel.LoginApproved += HandleLoginApproved;
+            PhotoHelpers.NoCameraDetected += HandleNoCameraDetected;
             _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
-            ViewModel.LoginFailed += HandleLoginFailed;
         }
 
         protected override void UnsubscribeEventHandlers()
         {
+			ViewModel.LoginFailed -= HandleLoginFailed;
+            ViewModel.LoginApproved -= HandleLoginApproved;
             PhotoHelpers.NoCameraDetected -= HandleNoCameraDetected;
-			_newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
-            ViewModel.LoginFailed -= HandleLoginFailed;
+            _newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
         }
 
         void AnimateLoginPage()
@@ -163,11 +174,29 @@ namespace FacialRecognitionLogin
             }
         }
 
-        void HandleNewUserSignUpButtonClicked(object sender, EventArgs e) =>
-           Navigation.PushModalAsync(new NewUserSignUpPage());
+        void HandleLoginFailed(object sender, LoginFailedEventArgs e) =>
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                switch (e.ShouldDisplaySignUpPrompt)
+                {
+                    case true:
+                        if (await DisplayAlert("Open Sign Up Page?", e.ErrorMessage, "Open", "Cancel"))
+                            OpenNewUserSignUpPage();
+                        break;
 
-        void HandleLoginFailed(object sender, string errorMessage) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "Okay"));
+                    default:
+                        await DisplayAlert("Error", e.ErrorMessage, "OK");
+                        break;
+
+                }
+            });
+
+        void OpenNewUserSignUpPage() => Device.BeginInvokeOnMainThread(async () => await Navigation.PushModalAsync(new NewUserSignUpPage()));
+
+        void HandleNewUserSignUpButtonClicked(object sender, EventArgs e) => OpenNewUserSignUpPage();
+
+        void HandleLoginApproved(object sender, EventArgs e) =>
+            Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
 
         void HandleNoCameraDetected(object sender, EventArgs e) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Unavailable", "OK"));
