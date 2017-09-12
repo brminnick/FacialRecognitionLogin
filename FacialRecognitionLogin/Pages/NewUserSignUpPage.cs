@@ -44,7 +44,7 @@ namespace FacialRecognitionLogin
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
-                Text = "Save Username",
+                Text = "Save User",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
@@ -77,8 +77,13 @@ namespace FacialRecognitionLogin
                 VerticalTextAlignment = TextAlignment.Center,
                 HorizontalTextAlignment = TextAlignment.Center
             };
-            isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
             isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(ViewModel.FontAwesomeLabelText));
+            switch (Device.RuntimePlatform)
+            {
+                case Device.iOS:
+                    isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
+                    break;
+            }
 
             var activityIndicator = new ActivityIndicator
             {
@@ -88,6 +93,17 @@ namespace FacialRecognitionLogin
             };
             activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
             activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
+
+            var facialRecognitionStackLayout = new StackLayout
+            {
+                Orientation = StackOrientation.Horizontal,
+                HorizontalOptions = LayoutOptions.Center,
+
+                Children ={
+                    isFacialRecognitionCompletedDescriptionLabel,
+                    isFacialRecognitionCompletedLabel
+                }
+            };
 
             var stackLayout = new StackLayout
             {
@@ -113,18 +129,22 @@ namespace FacialRecognitionLogin
 
                     _passwordEntry,
                     _takePhotoButton,
-                    new StackLayout{
-                        Orientation = StackOrientation.Horizontal,
-                        HorizontalOptions = LayoutOptions.Center,
-                        Children={
-                            isFacialRecognitionCompletedDescriptionLabel,
-                            isFacialRecognitionCompletedLabel,
-                            activityIndicator
-                        }},
-                    _saveUsernameButton,
-                    _cancelButton
+                    facialRecognitionStackLayout,
                 }
             };
+            switch (Device.RuntimePlatform)
+            {
+                case Device.iOS:
+                    facialRecognitionStackLayout.Children.Add(activityIndicator);
+                    break;
+                case Device.Android:
+                    stackLayout.Children.Add(activityIndicator);
+                    break;
+                default:
+                    throw new Exception("Device Runtime Unsupported");
+            }
+            stackLayout.Children.Add(_saveUsernameButton);
+            stackLayout.Children.Add(_cancelButton);
 
             Content = new ScrollView { Content = stackLayout };
         }
