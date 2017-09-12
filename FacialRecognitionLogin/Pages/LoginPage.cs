@@ -127,7 +127,7 @@ namespace FacialRecognitionLogin
         {
 			ViewModel.LoginFailed += HandleLoginFailed;
             ViewModel.LoginApproved += HandleLoginApproved;
-            PhotoHelpers.NoCameraDetected += HandleNoCameraDetected;
+            PhotoService.NoCameraDetected += HandleNoCameraDetected;
             _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
         }
 
@@ -135,7 +135,7 @@ namespace FacialRecognitionLogin
         {
 			ViewModel.LoginFailed -= HandleLoginFailed;
             ViewModel.LoginApproved -= HandleLoginApproved;
-            PhotoHelpers.NoCameraDetected -= HandleNoCameraDetected;
+            PhotoService.NoCameraDetected -= HandleNoCameraDetected;
             _newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
         }
 

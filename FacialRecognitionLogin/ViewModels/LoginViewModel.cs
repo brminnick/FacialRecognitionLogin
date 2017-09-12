@@ -55,9 +55,9 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var photoStream = await PhotoHelpers.GetPhotoStreamFromCamera();
+            var photoStream = await PhotoService.GetPhotoStreamFromCamera();
 
-            var isFaceRecognized = await FacialRecognitionHelpers.IsFaceIdentified(UsernameEntryText, photoStream);
+            var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(UsernameEntryText, photoStream);
 
             if (isFaceRecognized)
                 OnLoginApproved();

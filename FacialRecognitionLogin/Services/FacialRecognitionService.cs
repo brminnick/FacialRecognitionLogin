@@ -1,14 +1,16 @@
 ﻿using System;
-using Microsoft.ProjectOxford.Face;
-using System.Threading.Tasks;
 using System.IO;
-using System.Linq;
-using Xamarin.Forms;
 using System.Net;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.ProjectOxford.Face;
+
+using Xamarin.Forms;
 
 namespace FacialRecognitionLogin
 {
-    public static class FacialRecognitionHelpers
+    public static class FacialRecognitionService
     {
         #region Constant Fields
         const string _personGroupId = "persongroupid";

@@ -7,7 +7,7 @@ using Plugin.Media.Abstractions;
 
 namespace FacialRecognitionLogin
 {
-    public static class PhotoHelpers
+    public static class PhotoService
     {
         #region Events
         public static event EventHandler NoCameraDetected;

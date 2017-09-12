@@ -134,7 +134,7 @@ namespace FacialRecognitionLogin
             ViewModel.SaveFailed += HandleSaveFailed;
             _cancelButton.Clicked += HandleCancelButtonClicked;
             ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
-            PhotoHelpers.NoCameraDetected += HandleNoPhotoDetected;
+            PhotoService.NoCameraDetected += HandleNoPhotoDetected;
             ViewModel.SaveSuccessfullyCompleted += HandleSaveSuccessfullyCompleted;
         }
 
@@ -143,7 +143,7 @@ namespace FacialRecognitionLogin
             ViewModel.SaveFailed -= HandleSaveFailed;
             _cancelButton.Clicked -= HandleCancelButtonClicked;
             ViewModel.TakePhotoFailed -= HandleTakePhotoFailed;
-            PhotoHelpers.NoCameraDetected -= HandleNoPhotoDetected;
+            PhotoService.NoCameraDetected -= HandleNoPhotoDetected;
             ViewModel.SaveSuccessfullyCompleted -= HandleSaveSuccessfullyCompleted;
         }
 

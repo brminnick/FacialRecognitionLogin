@@ -66,13 +66,13 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var photoStream = await PhotoHelpers.GetPhotoStreamFromCamera();
+            var photoStream = await PhotoService.GetPhotoStreamFromCamera();
             if (photoStream == null)
                 return;
 
             try
             {
-                _facialRecognitionUserGUID = await FacialRecognitionHelpers.AddNewFace(username, photoStream);
+                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream);
                 FontAwesomeLabelText = _fontAwesomeCheckedBox.ToString();
             }
             catch (FaceAPIException e)
@@ -105,7 +105,7 @@ namespace FacialRecognitionLogin
         async Task ExecuteCancelButtonCommand()
         {
             if(!_facialRecognitionUserGUID.Equals(default(Guid)))
-                await FacialRecognitionHelpers.RemoveFace(_facialRecognitionUserGUID);
+                await FacialRecognitionService.RemoveFace(_facialRecognitionUserGUID);
         }
 
         void OnTakePhotoFailed(string errorMessage) =>
