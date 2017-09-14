@@ -57,6 +57,12 @@ namespace FacialRecognitionLogin
 
             var photoStream = await PhotoService.GetPhotoStreamFromCamera();
 
+            if(photoStream == null)
+            {
+                OnLoginFailed("Facial Recognition Required", false);
+                return;
+            }
+
             var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(UsernameEntryText, photoStream);
 
             if (isFaceRecognized)

@@ -30,6 +30,9 @@ namespace FacialRecognitionLogin
                 DefaultCamera = CameraDevice.Front,
             });
 
+            if (file == null)
+                return null;
+
             return GetPhotoStream(file, false);
         }
 

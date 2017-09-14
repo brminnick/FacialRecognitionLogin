@@ -19,8 +19,7 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Fields
-        string _logoFileImageSource;
-        bool isInitialized = false;
+        bool _isFirstAppearing;
         #endregion
 
         #region Constructors
@@ -118,7 +117,7 @@ namespace FacialRecognitionLogin
         {
             base.OnAppearing();
 
-            if (!isInitialized)
+            if (!_isFirstAppearing)
             {
                 AnimateLoginPage();
                 Navigation.InsertPageBefore(new FirstPage(), this);
@@ -159,7 +158,7 @@ namespace FacialRecognitionLogin
                                    _passwordEntry?.FadeTo(1, 250),
                                    _loginButton?.FadeTo(1, 249));
 
-                isInitialized = true;
+                _isFirstAppearing = true;
             });
         }
 
@@ -182,7 +181,7 @@ namespace FacialRecognitionLogin
                 switch (e.ShouldDisplaySignUpPrompt)
                 {
                     case true:
-                        if (await DisplayAlert("Open Sign Up Page?", e.ErrorMessage, "Open", "Cancel"))
+                        if (await DisplayAlert("Error", e.ErrorMessage, "Sign Up", "Cancel"))
                             OpenNewUserSignUpPage();
                         break;
 

@@ -34,10 +34,9 @@ namespace FacialRecognitionLogin
             {
                 await FaceServiceClient.DeletePersonAsync(_personGroupId, userId);
             }
-            catch (FaceAPIException e)
+            catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.NotFound))
             {
-                if (!e.HttpStatus.Equals(HttpStatusCode.NotFound))
-                    throw e;
+
             }
             finally
             {
@@ -134,10 +133,9 @@ namespace FacialRecognitionLogin
             {
                 await FaceServiceClient.CreatePersonGroupAsync(_personGroupId, _personGroupName);
             }
-            catch (FaceAPIException e)
+            catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.Conflict))
             {
-                if (!e.HttpStatus.Equals(HttpStatusCode.Conflict))
-                    throw e;
+
             }
         }
         #endregion
