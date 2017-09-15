@@ -1,5 +1,5 @@
 # Facial Recognition Login
-An iOS and Android app that uses facial recognition to enhance the security of a login page. 
+An iOS and Android app that uses facial recognition to provide 2-factor authentication for a login page. 
 
 Built using Xamarin.Forms and Microsoft Cognitive Services.
 
@@ -11,4 +11,8 @@ The Xamarin Developer docs have a walkthough to accomplish this: https://develop
 
 Note that BundleIDs and AppGroups are case-sensitive. I recommend using only lowercase letters for the app group name and BundleId.
 
+## Logging In
+![](https://github.com/brminnick/Videos/blob/master/FacialRecognitionLogin/LoginDemo.gif)
 
+## Creating New User Account
+![](https://github.com/brminnick/Videos/blob/master/FacialRecognitionLogin/CreateUserDemo.gif)
