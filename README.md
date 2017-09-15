@@ -1,7 +1,7 @@
 # Facial Recognition Login
 An iOS and Android app that uses facial recognition to provide 2-factor authentication for a login page. 
 
-Built using Xamarin.Forms and Microsoft Cognitive Services.
+Built using [Xamarin.Forms](https://www.xamarin.com/forms) and [Microsoft Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/face/).
 
 ## Getting Started - iOS
 
