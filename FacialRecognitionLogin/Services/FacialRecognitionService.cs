@@ -27,7 +27,7 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        public static async Task RemoveFace(Guid userId)
+        public static async Task RemoveExistingFace(Guid userId)
         {
             UpdateActivityIndicatorStatus(true);
             try

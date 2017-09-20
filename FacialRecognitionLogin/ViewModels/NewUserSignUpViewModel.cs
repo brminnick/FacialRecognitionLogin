@@ -107,7 +107,7 @@ namespace FacialRecognitionLogin
             await WaitForNewUserSignUpPageToDisappear();
 
             if (!_facialRecognitionUserGUID.Equals(default(Guid)))
-                await FacialRecognitionService.RemoveFace(_facialRecognitionUserGUID);
+                await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID);
         }
 
         async Task WaitForNewUserSignUpPageToDisappear() => await Task.Delay(1000);
