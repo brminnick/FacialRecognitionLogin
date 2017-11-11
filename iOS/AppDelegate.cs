@@ -7,7 +7,7 @@ using UIKit;
 
 namespace FacialRecognitionLogin.iOS
 {
-    [Register("AppDelegate")]
+    [Register(nameof(AppDelegate))]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)

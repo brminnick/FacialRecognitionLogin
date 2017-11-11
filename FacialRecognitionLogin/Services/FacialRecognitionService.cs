@@ -77,17 +77,10 @@ namespace FacialRecognitionLogin
 
                 var candidateList = results.SelectMany(x => x.Candidates).ToList();
 
-                await personListTask;
+                var personList = await personListTask.ConfigureAwait(false);
 
-                var matchingUsernamePersonList = personListTask.Result.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+                var matchingUsernamePersonList = personList.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
 
-                //foreach (var candiate in candidateList)
-                //{
-                //    var isMatchFound = matchingUsernamePersonList.Select(x => x.PersonId).Contains(candiate.PersonId);
-
-                //    if (isMatchFound)
-                //        return true;
-                //}
 
                 return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();
 
@@ -117,13 +110,10 @@ namespace FacialRecognitionLogin
                 currentViewModel.IsInternetConnectionActive = true;
                 _networkIndicatorCount++;
             }
-            else
+            else if (--_networkIndicatorCount <= 0)
             {
-                if (--_networkIndicatorCount <= 0)
-                {
-                    currentViewModel.IsInternetConnectionActive = false;
-                    _networkIndicatorCount = 0;
-                }
+                currentViewModel.IsInternetConnectionActive = false;
+                _networkIndicatorCount = 0;
             }
         }
 
