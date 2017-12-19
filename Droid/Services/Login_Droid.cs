@@ -11,49 +11,54 @@ using FacialRecognitionLogin.Droid;
 [assembly: Dependency(typeof(Login_Droid))]
 namespace FacialRecognitionLogin.Droid
 {
-	public class Login_Droid : ILogin
-	{
-		public async Task<bool> SetPasswordForUsername(string username, string password)
-		{
-			await BlobCache.UserAccount.InsertObject("username", username);
-			await BlobCache.UserAccount.InsertObject("password", password);
+    public class Login_Droid : ILogin
+    {
+        #region Constant Fields
+        const string _username = "username";
+        const string _password = "password";
+        #endregion
 
-			return true;
-		}
+        public async Task<bool> SetPasswordForUsername(string username, string password)
+        {
+            await BlobCache.UserAccount.InsertObject(_username, username);
+            await BlobCache.UserAccount.InsertObject(_password, password);
 
-		public async Task<bool> CheckLogin(string username, string password)
-		{
-			string _username = null;
-			string _password = null;
+            return true;
+        }
 
-			try
-			{
-				_username = await BlobCache.UserAccount.GetObject<string>("username");
-			}
-			catch (Exception)
-			{
-				return false;
-			}
+        public async Task<bool> CheckLogin(string username, string password)
+        {
+            string usernameFromSecureStorage = null;
+            string passwordFromSecureStorage = null;
 
-			try
-			{
-				_password = await BlobCache.UserAccount.GetObject<string>("password");
-			}
-			catch (Exception)
-			{
-				return false;
-			}
+            try
+            {
+                usernameFromSecureStorage = await BlobCache.UserAccount.GetObject<string>(_username);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
-			if (_username == null || _password == null)
-				return false;
+            try
+            {
+                passwordFromSecureStorage = await BlobCache.UserAccount.GetObject<string>(_password);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
-			if (password == _password &&
-				username == _username.ToString())
-			{
-				return true;
-			}
+            if (usernameFromSecureStorage == null || passwordFromSecureStorage == null)
+                return false;
 
-			return false;
-		}
-	}
+            if (password == passwordFromSecureStorage &&
+                username == usernameFromSecureStorage.ToString())
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
 }

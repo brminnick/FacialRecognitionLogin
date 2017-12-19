@@ -11,14 +11,19 @@ namespace FacialRecognitionLogin.iOS
 {
     public class Login_iOS : ILogin
     {
+        #region Constant Fields
+        const string _serviceId = "FacialRecognitionLogin";
+        const string _username = "username";
+        #endregion
 
+        #region Methods
         public Task<bool> SetPasswordForUsername(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return Task.FromResult(false);
 
-            KeychainHelpers.SetPasswordForUsername(username, password, "XamarinExpenses", Security.SecAccessible.Always, true);
-            NSUserDefaults.StandardUserDefaults.SetString(username, "username");
+            KeychainHelpers.SetPasswordForUsername(username, password, _serviceId, Security.SecAccessible.Always, true);
+            NSUserDefaults.StandardUserDefaults.SetString(username, _username);
             NSUserDefaults.StandardUserDefaults.SetBool(true, "hasLogin");
             NSUserDefaults.StandardUserDefaults.Synchronize();
 
@@ -27,20 +32,21 @@ namespace FacialRecognitionLogin.iOS
 
         public Task<bool> CheckLogin(string username, string password)
         {
-            var _username = NSUserDefaults.StandardUserDefaults.ValueForKey(new NSString("username"));
-            var _password = KeychainHelpers.GetPasswordForUsername(username, "XamarinExpenses", true);
+            var usernameFromKeyChain = NSUserDefaults.StandardUserDefaults.ValueForKey(new NSString(_username));
+            var passwordFromKeyChain = KeychainHelpers.GetPasswordForUsername(username, _serviceId, true);
 
-            if (_username == null || _password == null)
+            if (usernameFromKeyChain == null || passwordFromKeyChain == null)
                 return Task.FromResult(false);
-
-            if (password == _password &&
-                username == _username.ToString())
+            
+            if (password == passwordFromKeyChain.ToString() &&
+                username == usernameFromKeyChain.ToString())
             {
                 return Task.FromResult(true);
             }
 
             return Task.FromResult(false);
         }
+        #endregion
     }
 }
 
