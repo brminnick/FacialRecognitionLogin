@@ -106,12 +106,6 @@
     <Reference Include="EntryCustomReturn.Forms.Plugin.iOS">
       <HintPath>..\packages\Xam.Plugins.Forms.CustomReturnEntry.3.2.1\lib\Xamarin.iOS10\EntryCustomReturn.Forms.Plugin.iOS.dll</HintPath>
     </Reference>
-    <Reference Include="Plugin.Permissions.Abstractions">
-      <HintPath>..\packages\Plugin.Permissions.2.0.1\lib\Xamarin.iOS10\Plugin.Permissions.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Plugin.Permissions">
-      <HintPath>..\packages\Plugin.Permissions.2.0.1\lib\Xamarin.iOS10\Plugin.Permissions.dll</HintPath>
-    </Reference>
     <Reference Include="Plugin.Media.Abstractions">
       <HintPath>..\packages\Xam.Plugin.Media.3.1.1\lib\Xamarin.iOS10\Plugin.Media.Abstractions.dll</HintPath>
     </Reference>
@@ -129,6 +123,12 @@
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
       <HintPath>..\packages\Xamarin.Forms.2.5.0.121934\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Permissions.Abstractions">
+      <HintPath>..\packages\Plugin.Permissions.2.1.0\lib\Xamarin.iOS10\Plugin.Permissions.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Permissions">
+      <HintPath>..\packages\Plugin.Permissions.2.1.0\lib\Xamarin.iOS10\Plugin.Permissions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
