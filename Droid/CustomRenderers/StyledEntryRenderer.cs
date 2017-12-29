@@ -1,4 +1,5 @@
 ﻿using Android.Widget;
+using Android.Content;
 using Android.Graphics;
 
 using Xamarin.Forms;
@@ -10,20 +11,25 @@ using FacialRecognitionLogin.Droid;
 [assembly: ExportRenderer(typeof(StyledEntry), typeof(StyledEntryRenderer))]
 namespace FacialRecognitionLogin.Droid
 {
-	public class StyledEntryRenderer : EntryRenderer
-	{
-		protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
-		{
-			base.OnElementChanged(e);
+    public class StyledEntryRenderer : EntryRenderer
+    {
+        public StyledEntryRenderer(Context context) : base(context)
+        {
 
-			if (e.NewElement != null)
-			{
-				var droidEditText = Control as EditText;
-				droidEditText.SetHintTextColor(Xamarin.Forms.Color.White.ToAndroid());
+        }
 
-				Typeface font = Typeface.Create("Droid Sans Mono", TypefaceStyle.Normal);
-				droidEditText.Typeface = font;
-			}
-		}
-	}
+        protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
+        {
+            base.OnElementChanged(e);
+
+            if (e.NewElement != null)
+            {
+                var droidEditText = Control as EditText;
+                droidEditText.SetHintTextColor(Xamarin.Forms.Color.White.ToAndroid());
+
+                Typeface font = Typeface.Create("Droid Sans Mono", TypefaceStyle.Normal);
+                droidEditText.Typeface = font;
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ using Xamarin.Forms.Platform.Android;
 
 using FacialRecognitionLogin;
 using FacialRecognitionLogin.Droid;
+
 using Plugin.CurrentActivity;
 
 [assembly: ExportRenderer(typeof(FontAwesomeIcon), typeof(FontAwesomeIconRenderer))]
