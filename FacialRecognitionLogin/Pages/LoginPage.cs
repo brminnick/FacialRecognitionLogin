@@ -120,7 +120,7 @@ namespace FacialRecognitionLogin
             if (!_isFirstAppearing)
             {
                 AnimateLoginPage();
-                Navigation.InsertPageBefore(new FirstPage(), this);
+                Navigation.InsertPageBefore(new SuccessPage(), this);
             }
         }
 
@@ -167,7 +167,7 @@ namespace FacialRecognitionLogin
             switch (Device.RuntimePlatform)
             {
                 case Device.Android:
-                    return new Thickness(0, 20, 0, 0);
+                    return new Thickness(0, 44, 0, 0);
                 case Device.iOS:
                     return new Thickness(0, 0, 0, 0);
                 default:
@@ -175,7 +175,8 @@ namespace FacialRecognitionLogin
             }
         }
 
-        void HandleLoginFailed(object sender, LoginFailedEventArgs e) =>
+        void HandleLoginFailed(object sender, LoginFailedEventArgs e)
+        {
             Device.BeginInvokeOnMainThread(async () =>
             {
                 switch (e.ShouldDisplaySignUpPrompt)
@@ -191,6 +192,7 @@ namespace FacialRecognitionLogin
 
                 }
             });
+        }
 
         void OpenNewUserSignUpPage() => Device.BeginInvokeOnMainThread(async () => await Navigation.PushModalAsync(new NewUserSignUpPage()));
 

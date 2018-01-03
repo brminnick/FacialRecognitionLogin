@@ -12,40 +12,44 @@ using FacialRecognitionLogin.iOS;
 
 namespace FacialRecognitionLogin.iOS
 {
-	public class StyledEntryRenderer : EntryRenderer
-	{
-		UITextField nativeTextField;
-		bool isInitialized;
+    public class StyledEntryRenderer : EntryRenderer
+    {
+        #region Fields
+        UITextField _nativeTextField;
+        bool _isInitialized;
+        #endregion
 
-		protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			base.OnElementPropertyChanged(sender, e);
+        #region Methods
+        protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
 
-			if (e.PropertyName == "IsEnabled")
-			{
-				if (!nativeTextField.Enabled)
-					nativeTextField.TextColor = UIColor.White;
-				else
-					nativeTextField.TextColor = UIColor.Blue;
-			}
-		}
+            if (e.PropertyName == "IsEnabled")
+            {
+                if (!_nativeTextField.Enabled)
+                    _nativeTextField.TextColor = UIColor.White;
+                else
+                    _nativeTextField.TextColor = UIColor.Blue;
+            }
+        }
 
-		protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
-		{
-			base.OnElementChanged(e);
+        protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
+        {
+            base.OnElementChanged(e);
 
-			if (e.NewElement != null && !isInitialized)
-			{
-				var formsEntry = e.NewElement as StyledEntry;
-				nativeTextField = Control as UITextField;
-				nativeTextField.Font = UIFont.FromName("AppleSDGothicNeo-Light", 18);
-				nativeTextField.TextColor = UIColor.White;
+            if (e.NewElement != null && !_isInitialized)
+            {
+                var formsEntry = e.NewElement as StyledEntry;
+                _nativeTextField = Control as UITextField;
+                _nativeTextField.Font = UIFont.FromName("AppleSDGothicNeo-Light", 18);
+                _nativeTextField.TextColor = UIColor.White;
 
-				if (!string.IsNullOrEmpty(formsEntry.Placeholder))
-					nativeTextField.AttributedPlaceholder = new NSAttributedString(formsEntry.Placeholder, UIFont.FromName("AppleSDGothicNeo-Light", 18), UIColor.White);
+                if (!string.IsNullOrEmpty(formsEntry.Placeholder))
+                    _nativeTextField.AttributedPlaceholder = new NSAttributedString(formsEntry.Placeholder, UIFont.FromName("AppleSDGothicNeo-Light", 18), UIColor.White);
 
-				isInitialized = true;
-			}
-		}
-	}
+                _isInitialized = true;
+            }
+        }
+        #endregion
+    }
 }

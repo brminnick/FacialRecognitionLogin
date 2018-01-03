@@ -4,17 +4,22 @@ namespace FacialRecognitionLogin
 {
     public class App : Application
     {
-        public App()
+        public App() => InitializeMainPage();
+
+        public static void InitializeMainPage()
         {
-            var loginPage = new LoginPage();
-
-            MainPage = new NavigationPage(loginPage)
+            Device.BeginInvokeOnMainThread(() =>
             {
-                BarBackgroundColor = Color.FromHex("#3498db"),
-                BarTextColor = Color.White,
-            };
+                var loginPage = new LoginPage();
 
-            NavigationPage.SetHasNavigationBar(loginPage, false);
+                Current.MainPage = new NavigationPage(loginPage)
+                {
+                    BarBackgroundColor = Color.FromHex("#3498db"),
+                    BarTextColor = Color.White,
+                };
+
+                NavigationPage.SetHasNavigationBar(loginPage, false);
+            });
         }
     }
 }

@@ -185,12 +185,14 @@ namespace FacialRecognitionLogin
             base.LayoutChildren(x, y, width, height);
         }
 
-        void HandleSaveSuccessfullyCompleted(object sender, EventArgs e) =>
+        void HandleSaveSuccessfullyCompleted(object sender, EventArgs e)
+        {
             Device.BeginInvokeOnMainThread(async () =>
             {
                 await DisplayAlert("Success", "New User Created", "OK");
                 await Navigation.PopModalAsync();
             });
+        }
 
         void HandleSaveFailed(object sender, string errorMessage) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
