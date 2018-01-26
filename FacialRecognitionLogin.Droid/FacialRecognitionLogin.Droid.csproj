@@ -183,10 +183,10 @@
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
     <Reference Include="EntryCustomReturn.Forms.Plugin.Abstractions">
-      <HintPath>..\packages\Xam.Plugins.Forms.CustomReturnEntry.3.3.0\lib\MonoAndroid10\EntryCustomReturn.Forms.Plugin.Abstractions.dll</HintPath>
+      <HintPath>..\packages\Xam.Plugins.Forms.CustomReturnEntry.4.0.0-pre4\lib\MonoAndroid10\EntryCustomReturn.Forms.Plugin.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="EntryCustomReturn.Forms.Plugin.Android">
-      <HintPath>..\packages\Xam.Plugins.Forms.CustomReturnEntry.3.3.0\lib\MonoAndroid10\EntryCustomReturn.Forms.Plugin.Android.dll</HintPath>
+      <HintPath>..\packages\Xam.Plugins.Forms.CustomReturnEntry.4.0.0-pre4\lib\MonoAndroid10\EntryCustomReturn.Forms.Plugin.Android.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
