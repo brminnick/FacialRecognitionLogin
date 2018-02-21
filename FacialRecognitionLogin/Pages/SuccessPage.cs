@@ -18,15 +18,30 @@ namespace FacialRecognitionLogin
             Padding = GetPagePadding();
             Title = "Success";
 
-            _logoutButton = new Button
+            var successLabel = new Label
             {
                 TextColor = Color.White,
-                Text = "Logout",
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center
+                Text = "Login Successful"
             };
 
-            Content = _logoutButton;
+            _logoutButton = new Button
+            {
+                BorderColor = Color.White,
+                BorderWidth = 1,
+                TextColor = Color.White,
+                Text = "Logout"
+            };
+
+            Content = new StackLayout
+            {
+                Spacing = 35,
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center,
+                Children = {
+                    successLabel,
+                    _logoutButton
+                }
+            };
         }
         #endregion
 
