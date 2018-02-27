@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Input;
 using System.Threading.Tasks;
 
-using Plugin.Media;
-using Plugin.Media.Abstractions;
-
 using Xamarin.Forms;
+
 namespace FacialRecognitionLogin
 {
     public class LoginViewModel : BaseViewModel
