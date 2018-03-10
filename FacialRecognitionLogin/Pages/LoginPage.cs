@@ -7,7 +7,7 @@ using EntryCustomReturn.Forms.Plugin.Abstractions;
 
 namespace FacialRecognitionLogin
 {
-    public class LoginPage : BaseContentPage<LoginViewModel>
+    public class LoginPage : BaseMediaContentPage<LoginViewModel>
     {
         #region Constant Fields
         const double _relativeLayoutPadding = 10;
@@ -19,7 +19,7 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Fields
-        bool _isFirstAppearing;
+        bool _hasAnimated;
         #endregion
 
         #region Constructors
@@ -117,7 +117,7 @@ namespace FacialRecognitionLogin
         {
             base.OnAppearing();
 
-            if (!_isFirstAppearing)
+            if (!_hasAnimated)
             {
                 AnimateLoginPage();
                 Navigation.InsertPageBefore(new SuccessPage(), this);
@@ -126,17 +126,19 @@ namespace FacialRecognitionLogin
 
         protected override void SubscribeEventHandlers()
         {
+            base.SubscribeEventHandlers();
+
 			ViewModel.LoginFailed += HandleLoginFailed;
             ViewModel.LoginApproved += HandleLoginApproved;
-            PhotoService.NoCameraDetected += HandleNoCameraDetected;
             _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
         }
 
         protected override void UnsubscribeEventHandlers()
         {
+            base.UnsubscribeEventHandlers();
+
 			ViewModel.LoginFailed -= HandleLoginFailed;
             ViewModel.LoginApproved -= HandleLoginApproved;
-            PhotoService.NoCameraDetected -= HandleNoCameraDetected;
             _newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
         }
 
@@ -158,7 +160,7 @@ namespace FacialRecognitionLogin
                                    _passwordEntry?.FadeTo(1, 250),
                                    _loginButton?.FadeTo(1, 249));
 
-                _isFirstAppearing = true;
+                _hasAnimated = true;
             });
         }
 

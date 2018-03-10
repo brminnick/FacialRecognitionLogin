@@ -6,7 +6,7 @@ using EntryCustomReturn.Forms.Plugin.Abstractions;
 
 namespace FacialRecognitionLogin
 {
-    public class NewUserSignUpPage : BaseContentPage<NewUserSignUpViewModel>
+    public class NewUserSignUpPage : BaseMediaContentPage<NewUserSignUpViewModel>
     {
         #region Constant Fields
         readonly StyledButton _saveUsernameButton, _cancelButton, _takePhotoButton;
@@ -40,7 +40,7 @@ namespace FacialRecognitionLogin
             };
             _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
             CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
-            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(Unfocus));
+            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(_passwordEntry.Unfocus));
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
@@ -160,19 +160,21 @@ namespace FacialRecognitionLogin
 
         protected override void SubscribeEventHandlers()
         {
+            base.SubscribeEventHandlers();
+
             ViewModel.SaveFailed += HandleSaveFailed;
             _cancelButton.Clicked += HandleCancelButtonClicked;
             ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
-            PhotoService.NoCameraDetected += HandleNoPhotoDetected;
             ViewModel.SaveSuccessfullyCompleted += HandleSaveSuccessfullyCompleted;
         }
 
         protected override void UnsubscribeEventHandlers()
         {
+            base.UnsubscribeEventHandlers();
+
             ViewModel.SaveFailed -= HandleSaveFailed;
             _cancelButton.Clicked -= HandleCancelButtonClicked;
             ViewModel.TakePhotoFailed -= HandleTakePhotoFailed;
-            PhotoService.NoCameraDetected -= HandleNoPhotoDetected;
             ViewModel.SaveSuccessfullyCompleted -= HandleSaveSuccessfullyCompleted;
         }
 
@@ -196,9 +198,6 @@ namespace FacialRecognitionLogin
 
         void HandleSaveFailed(object sender, string errorMessage) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
-
-        void HandleNoPhotoDetected(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Not Available", "OK"));
 
         void HandleCancelButtonClicked(object sender, EventArgs e) =>
             Device.BeginInvokeOnMainThread(async () => await Navigation.PopModalAsync());
