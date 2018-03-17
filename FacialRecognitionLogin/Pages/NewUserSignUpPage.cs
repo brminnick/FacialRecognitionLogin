@@ -151,13 +151,6 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-
-            Device.BeginInvokeOnMainThread(() => _usernameEntry.Focus());
-        }
-
         protected override void SubscribeEventHandlers()
         {
             base.SubscribeEventHandlers();

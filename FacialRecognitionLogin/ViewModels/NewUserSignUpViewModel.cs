@@ -10,13 +10,9 @@ namespace FacialRecognitionLogin
 {
     public class NewUserSignUpViewModel : BaseViewModel
     {
-        #region Constant Fields
-        const char _fontAwesomeCheckedBox = '\uf046', _fontAwesomeEmptyBox = '\uf096';
-        #endregion
-
         #region Fields
         Guid _facialRecognitionUserGUID;
-        string _usernameEntryText, _passwordEntryText, _fontAwesomeLabelText = _fontAwesomeEmptyBox.ToString();
+        string _usernameEntryText, _passwordEntryText, _fontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
         ICommand _takePhotoButtonCommand, _saveButtonCommand, _cancelButtonCommand;
         #endregion
 
@@ -39,7 +35,7 @@ namespace FacialRecognitionLogin
         public string UsernameEntryText
         {
             get => _usernameEntryText;
-            set => SetProperty(ref _usernameEntryText, value, () => FontAwesomeLabelText = _fontAwesomeEmptyBox.ToString());
+            set => SetProperty(ref _usernameEntryText, value, () => FontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString());
         }
 
         public string PasswordEntryText
@@ -73,23 +69,23 @@ namespace FacialRecognitionLogin
             try
             {
                 _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream);
-                FontAwesomeLabelText = _fontAwesomeCheckedBox.ToString();
+                FontAwesomeLabelText = FontAwesomeIcon.CheckedBox.ToString();
             }
             catch (FaceAPIException e)
             {
                 OnTakePhotoFailed(e.ErrorMessage);
-                FontAwesomeLabelText = _fontAwesomeEmptyBox.ToString();
+                FontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
             }
             catch (Exception e)
             {
                 OnTakePhotoFailed(e.Message);
-                FontAwesomeLabelText = _fontAwesomeEmptyBox.ToString();
+                FontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
             }
         }
 
         async Task ExecuteSaveButtonCommand(string username, string password)
         {
-            if (FontAwesomeLabelText.Equals(_fontAwesomeEmptyBox.ToString()))
+            if (FontAwesomeLabelText.Equals(FontAwesomeIcon.EmptyBox.ToString()))
             {
                 OnSaveFailed("Photo Required for Facial Recognition");
                 return;
