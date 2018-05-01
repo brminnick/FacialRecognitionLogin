@@ -7,22 +7,8 @@ namespace FacialRecognitionLogin
 {
     public abstract class BaseViewModel : INotifyPropertyChanged
     {
-        #region Fields
-        bool _isInternetConnectionActive;
-        #endregion
-
         #region Events
         public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
-
-        #region Properties
-        public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
-
-        public bool IsInternetConnectionActive
-        {
-            get => _isInternetConnectionActive;
-            set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
-        }
         #endregion
 
         #region Methods
