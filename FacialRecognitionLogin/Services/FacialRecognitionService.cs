@@ -4,9 +4,11 @@ using System.Net;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.ProjectOxford.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 
 using Xamarin.Forms;
+using System.Diagnostics;
 
 namespace FacialRecognitionLogin
 {
@@ -15,7 +17,8 @@ namespace FacialRecognitionLogin
 		#region Constant Fields
 		const string _personGroupId = "persongroupid";
 		const string _personGroupName = "Facial Recognition Login Group";
-		static readonly Lazy<FaceServiceClient> _faceServiceClientHolder = new Lazy<FaceServiceClient>(() => new FaceServiceClient(AzureConstants.FacialRecognitionAPIKey));
+		static readonly Lazy<FaceAPI> _faceApiClientHolder = new Lazy<FaceAPI>(() =>
+																new FaceAPI(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { AzureRegion = AzureRegions.Westus });
 		#endregion
 
 		#region Fields
@@ -23,7 +26,7 @@ namespace FacialRecognitionLogin
 		#endregion
 
 		#region Properties
-		static FaceServiceClient FaceServiceClient => _faceServiceClientHolder.Value;
+		static FaceAPI FaceApiClient => _faceApiClientHolder.Value;
 		#endregion
 
 		#region Methods
@@ -32,11 +35,12 @@ namespace FacialRecognitionLogin
 			UpdateActivityIndicatorStatus(true);
 			try
 			{
-				await FaceServiceClient.DeletePersonAsync(_personGroupId, userId);
+				await FaceApiClient.PersonGroupPerson.DeleteAsync(_personGroupId, userId).ConfigureAwait(false);
 			}
-			catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.NotFound))
+			catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.NotFound))
 			{
-
+				Debug.WriteLine("Person Does Not Exist");
+                DebugHelpers.PrintException(e);
 			}
 			finally
 			{
@@ -50,13 +54,15 @@ namespace FacialRecognitionLogin
 
 			try
 			{
-				await CreatePersonGroup();
+				await CreatePersonGroup().ConfigureAwait(false);
 
-				var personResult = await FaceServiceClient.CreatePersonAsync(_personGroupId, username);
+				var createPersonResult = await FaceApiClient.PersonGroupPerson.CreateAsync(_personGroupId, username).ConfigureAwait(false);
 
-				var faceResult = await FaceServiceClient.AddPersonFaceAsync(_personGroupId, personResult.PersonId, photo);
+				var faceResult = await FaceApiClient.PersonGroupPerson.AddPersonFaceFromStreamAsync(_personGroupId, createPersonResult.PersonId, photo).ConfigureAwait(false);
 
-				await FaceServiceClient.TrainPersonGroupAsync(_personGroupId);
+				var trainingStatus = await TrainPersonGroup(_personGroupId).ConfigureAwait(false);
+				if (trainingStatus.Status.Equals(TrainingStatusType.Failed))
+					throw new Exception(trainingStatus.Message);
 
 				return faceResult.PersistedFaceId;
 			}
@@ -71,19 +77,20 @@ namespace FacialRecognitionLogin
 			UpdateActivityIndicatorStatus(true);
 			try
 			{
-				var personListTask = FaceServiceClient.GetPersonsAsync(_personGroupId);
-				var faces = await FaceServiceClient.DetectAsync(photo);
-				var results = await FaceServiceClient.IdentifyAsync(_personGroupId, faces.Select(x => x.FaceId).ToArray());
+				var personGroupListTask = FaceApiClient.PersonGroupPerson.ListAsync(_personGroupId);
 
-				var candidateList = results.SelectMany(x => x.Candidates).ToList();
+				var facesDetected = await FaceApiClient.Face.DetectWithStreamAsync(photo).ConfigureAwait(false);
+				var faceDetectedIds = facesDetected.Select(x => x.FaceId ?? new Guid()).ToArray();
 
-				var personList = await personListTask.ConfigureAwait(false);
+				var facesIdentified = await FaceApiClient.Face.IdentifyAsync(_personGroupId, faceDetectedIds).ConfigureAwait(false);
 
-				var matchingUsernamePersonList = personList.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+				var candidateList = facesIdentified.SelectMany(x => x.Candidates).ToList();
 
+				var personGroupList = await personGroupListTask.ConfigureAwait(false);
 
-				return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();
-
+				var matchingUsernamePersonList = personGroupList.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+                            
+				return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();            
 			}
 			catch
 			{
@@ -115,12 +122,28 @@ namespace FacialRecognitionLogin
 		{
 			try
 			{
-				await FaceServiceClient.CreatePersonGroupAsync(_personGroupId, _personGroupName);
+				await FaceApiClient.PersonGroup.CreateAsync(_personGroupId, _personGroupName).ConfigureAwait(false);
 			}
-			catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.Conflict))
+			catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.Conflict))
 			{
-
+				Debug.WriteLine("Person Group Already Exists");
+				DebugHelpers.PrintException(e);
 			}
+		}
+
+		static async Task<TrainingStatus> TrainPersonGroup(string personGroupId)
+		{
+			TrainingStatus trainingStatus;
+
+			await FaceApiClient.PersonGroup.TrainAsync(personGroupId).ConfigureAwait(false);
+
+			do
+			{
+				trainingStatus = await FaceApiClient.PersonGroup.GetTrainingStatusAsync(_personGroupId).ConfigureAwait(false);
+			}
+			while (!(trainingStatus.Status == TrainingStatusType.Failed || trainingStatus.Status == TrainingStatusType.Succeeded));
+
+			return trainingStatus;
 		}
 
 		static BaseViewModel GetCurrentViewModel()

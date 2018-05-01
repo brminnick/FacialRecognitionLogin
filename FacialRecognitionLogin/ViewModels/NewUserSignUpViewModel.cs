@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Microsoft.ProjectOxford.Face;
-
 using Xamarin.Forms;
 
 namespace FacialRecognitionLogin
@@ -71,11 +69,6 @@ namespace FacialRecognitionLogin
                 _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream);
                 FontAwesomeLabelText = FontAwesomeIcon.CheckedBox.ToString();
             }
-            catch (FaceAPIException e)
-            {
-                OnTakePhotoFailed(e.ErrorMessage);
-                FontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
-            }
             catch (Exception e)
             {
                 OnTakePhotoFailed(e.Message);
@@ -103,7 +96,7 @@ namespace FacialRecognitionLogin
             await WaitForNewUserSignUpPageToDisappear();
 
             if (!_facialRecognitionUserGUID.Equals(default(Guid)))
-                await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID);
+                await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID).ConfigureAwait(false);
         }
 
         async Task WaitForNewUserSignUpPageToDisappear() => await Task.Delay(1000);
