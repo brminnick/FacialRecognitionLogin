@@ -49,7 +49,7 @@ namespace FacialRecognitionLogin.Droid
                 return false;
             }
 
-            if (usernameFromSecureStorage == null || passwordFromSecureStorage == null)
+            if (usernameFromSecureStorage is null || passwordFromSecureStorage is null)
                 return false;
 
             if (password == passwordFromSecureStorage &&

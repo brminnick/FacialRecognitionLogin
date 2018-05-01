@@ -63,7 +63,7 @@ namespace FacialRecognitionLogin
             }
 
             var photoStream = await PhotoService.GetPhotoStreamFromCamera();
-            if (photoStream == null)
+            if (photoStream is null)
                 return;
 
             try

@@ -29,7 +29,7 @@ namespace FacialRecognitionLogin.Droid
         {
             base.OnElementChanged(e);
 
-            if (e.OldElement == null)
+            if (e.OldElement is null)
                 Control.Typeface = Typeface.CreateFromAsset(CurrentContext.Assets, "FontAwesome.ttf");
         }
         #endregion
