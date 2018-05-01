@@ -5,41 +5,41 @@ using System.Runtime.CompilerServices;
 
 namespace FacialRecognitionLogin
 {
-    public abstract class BaseViewModel : INotifyPropertyChanged
-    {
-        #region Fields
-        bool _isInternetConnectionActive;
-        #endregion
+	public abstract class BaseViewModel : INotifyPropertyChanged
+	{
+		#region Fields
+		bool _isInternetConnectionActive;
+		#endregion
 
-        #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+		#region Events
+		public event PropertyChangedEventHandler PropertyChanged;
+		#endregion
 
-        #region Properties
-        public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
+		#region Properties
+		public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
 
-        public bool IsInternetConnectionActive
-        {
-            get => _isInternetConnectionActive;
-            set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
-        }
-        #endregion
+		public bool IsInternetConnectionActive
+		{
+			get => _isInternetConnectionActive;
+			set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
+		}
+		#endregion
 
-        #region Methods
-        protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return;
+		#region Methods
+		protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
+		{
+			if (EqualityComparer<T>.Default.Equals(backingStore, value))
+				return;
 
-            backingStore = value;
+			backingStore = value;
 
-            onChanged?.Invoke();
+			onChanged?.Invoke();
 
-            OnPropertyChanged(propertyname);
-        }
+			OnPropertyChanged(propertyname);
+		}
 
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        #endregion
-    }
+		protected void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		#endregion
+	}
 }

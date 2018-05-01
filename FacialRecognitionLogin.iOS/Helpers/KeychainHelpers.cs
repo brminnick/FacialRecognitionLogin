@@ -22,12 +22,12 @@ namespace FacialRecognitionLogin.iOS
 		/// <returns>Status code</returns>
 		public static SecStatusCode DeletePasswordForUsername(string username, string serviceId, bool synchronizable)
 		{
-			if (username == null)
+			if (username is null)
 			{
 				throw new ArgumentNullException("userName");
 			}
 
-			if (serviceId == null)
+			if (serviceId is null)
 			{
 				throw new ArgumentNullException("serviceId");
 			}
@@ -62,17 +62,17 @@ namespace FacialRecognitionLogin.iOS
 		/// <returns>SecStatusCode.Success if everything went fine, otherwise some other status</returns>
 		public static SecStatusCode SetPasswordForUsername(string username, string password, string serviceId, SecAccessible secAccessible, bool synchronizable)
 		{
-			if (username == null)
+			if (username is null)
 			{
 				throw new ArgumentNullException("userName");
 			}
 
-			if (serviceId == null)
+			if (serviceId is null)
 			{
 				throw new ArgumentNullException("serviceId");
 			}
 
-			if (password == null)
+			if (password is null)
 			{
 				throw new ArgumentNullException("password");
 			}
@@ -113,12 +113,12 @@ namespace FacialRecognitionLogin.iOS
 		/// </returns>
 		public static string GetPasswordForUsername(string username, string serviceId, bool synchronizable)
 		{
-			if (username == null)
+			if (username is null)
 			{
 				throw new ArgumentNullException("userName");
 			}
 
-			if (serviceId == null)
+			if (serviceId is null)
 			{
 				throw new ArgumentNullException("serviceId");
 			}

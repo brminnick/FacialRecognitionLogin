@@ -4,130 +4,158 @@ using System.Net;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.ProjectOxford.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 
 using Xamarin.Forms;
+using System.Diagnostics;
 
 namespace FacialRecognitionLogin
 {
-    public static class FacialRecognitionService
-    {
-        #region Constant Fields
-        const string _personGroupId = "persongroupid";
-        const string _personGroupName = "Facial Recognition Login Group";
-        static readonly Lazy<FaceServiceClient> _faceServiceClientHolder = new Lazy<FaceServiceClient>(() => new FaceServiceClient(AzureConstants.FacialRecognitionAPIKey));
-        #endregion
+	public static class FacialRecognitionService
+	{
+		#region Constant Fields
+		const string _personGroupId = "persongroupid";
+		const string _personGroupName = "Facial Recognition Login Group";
+		static readonly Lazy<FaceAPI> _faceApiClientHolder = new Lazy<FaceAPI>(() =>
+																new FaceAPI(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { AzureRegion = AzureRegions.Westus });
+		#endregion
 
-        #region Fields
-        static int _networkIndicatorCount = 0;
-        #endregion
+		#region Fields
+		static int _networkIndicatorCount = 0;
+		#endregion
 
-        #region Properties
-        static FaceServiceClient FaceServiceClient => _faceServiceClientHolder.Value;
-        #endregion
+		#region Properties
+		static FaceAPI FaceApiClient => _faceApiClientHolder.Value;
+		#endregion
 
-        #region Methods
-        public static async Task RemoveExistingFace(Guid userId)
-        {
-            UpdateActivityIndicatorStatus(true);
-            try
-            {
-                await FaceServiceClient.DeletePersonAsync(_personGroupId, userId);
-            }
-            catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.NotFound))
-            {
+		#region Methods
+		public static async Task RemoveExistingFace(Guid userId)
+		{
+			UpdateActivityIndicatorStatus(true);
+			try
+			{
+				await FaceApiClient.PersonGroupPerson.DeleteAsync(_personGroupId, userId).ConfigureAwait(false);
+			}
+			catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.NotFound))
+			{
+				Debug.WriteLine("Person Does Not Exist");
+                DebugHelpers.PrintException(e);
+			}
+			finally
+			{
+				UpdateActivityIndicatorStatus(false);
+			}
+		}
 
-            }
-            finally
-            {
-                UpdateActivityIndicatorStatus(false);
-            }
-        }
+		public static async Task<Guid> AddNewFace(string username, Stream photo)
+		{
+			UpdateActivityIndicatorStatus(true);
 
-        public static async Task<Guid> AddNewFace(string username, Stream photo)
-        {
-            UpdateActivityIndicatorStatus(true);
+			try
+			{
+				await CreatePersonGroup().ConfigureAwait(false);
 
-            try
-            {
-                await CreatePersonGroup();
+				var createPersonResult = await FaceApiClient.PersonGroupPerson.CreateAsync(_personGroupId, username).ConfigureAwait(false);
 
-                var personResult = await FaceServiceClient.CreatePersonAsync(_personGroupId, username);
+				var faceResult = await FaceApiClient.PersonGroupPerson.AddPersonFaceFromStreamAsync(_personGroupId, createPersonResult.PersonId, photo).ConfigureAwait(false);
 
-                var faceResult = await FaceServiceClient.AddPersonFaceAsync(_personGroupId, personResult.PersonId, photo);
+				var trainingStatus = await TrainPersonGroup(_personGroupId).ConfigureAwait(false);
+				if (trainingStatus.Status.Equals(TrainingStatusType.Failed))
+					throw new Exception(trainingStatus.Message);
 
-                await FaceServiceClient.TrainPersonGroupAsync(_personGroupId);
+				return faceResult.PersistedFaceId;
+			}
+			finally
+			{
+				UpdateActivityIndicatorStatus(false);
+			}
+		}
 
-                return faceResult.PersistedFaceId;
-            }
-            finally
-            {
-                UpdateActivityIndicatorStatus(false);
-            }
-        }
+		public static async Task<bool> IsFaceIdentified(string username, Stream photo)
+		{
+			UpdateActivityIndicatorStatus(true);
+			try
+			{
+				var personGroupListTask = FaceApiClient.PersonGroupPerson.ListAsync(_personGroupId);
 
-        public static async Task<bool> IsFaceIdentified(string username, Stream photo)
-        {
-            UpdateActivityIndicatorStatus(true);
-            try
-            {
-                var personListTask = FaceServiceClient.GetPersonsAsync(_personGroupId);
-                var faces = await FaceServiceClient.DetectAsync(photo);
-                var results = await FaceServiceClient.IdentifyAsync(_personGroupId, faces.Select(x => x.FaceId).ToArray());
+				var facesDetected = await FaceApiClient.Face.DetectWithStreamAsync(photo).ConfigureAwait(false);
+				var faceDetectedIds = facesDetected.Select(x => x.FaceId ?? new Guid()).ToArray();
 
-                var candidateList = results.SelectMany(x => x.Candidates).ToList();
+				var facesIdentified = await FaceApiClient.Face.IdentifyAsync(_personGroupId, faceDetectedIds).ConfigureAwait(false);
 
-                var personList = await personListTask.ConfigureAwait(false);
+				var candidateList = facesIdentified.SelectMany(x => x.Candidates).ToList();
 
-                var matchingUsernamePersonList = personList.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+				var personGroupList = await personGroupListTask.ConfigureAwait(false);
 
+				var matchingUsernamePersonList = personGroupList.Where(x => x.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+                            
+				return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();            
+			}
+			catch
+			{
+				return false;
+			}
+			finally
+			{
+				UpdateActivityIndicatorStatus(false);
+			}
+		}
 
-                return candidateList.Select(x => x.PersonId).Intersect(matchingUsernamePersonList.Select(y => y.PersonId)).Any();
+		static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
+		{
+			var viewModel = GetCurrentViewModel();
 
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            finally
-            {
-                UpdateActivityIndicatorStatus(false);
-            }
-        }
+			if (isActivityIndicatorDisplayed)
+			{
+				viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = true;
+				_networkIndicatorCount++;
+			}
+			else if (--_networkIndicatorCount <= 0)
+			{
+				viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = false;
+				_networkIndicatorCount = 0;
+			}
+		}
 
-        static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
-        {
-            Page currentPage;
-            if (Application.Current.MainPage.Navigation.ModalStack.Any())
-                currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
-            else
-                currentPage = Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
+		static async Task CreatePersonGroup()
+		{
+			try
+			{
+				await FaceApiClient.PersonGroup.CreateAsync(_personGroupId, _personGroupName).ConfigureAwait(false);
+			}
+			catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.Conflict))
+			{
+				Debug.WriteLine("Person Group Already Exists");
+				DebugHelpers.PrintException(e);
+			}
+		}
 
-            var currentViewModel = currentPage.BindingContext as BaseViewModel;
+		static async Task<TrainingStatus> TrainPersonGroup(string personGroupId)
+		{
+			TrainingStatus trainingStatus;
 
-            if (isActivityIndicatorDisplayed)
-            {
-                currentViewModel.IsInternetConnectionActive = true;
-                _networkIndicatorCount++;
-            }
-            else if (--_networkIndicatorCount <= 0)
-            {
-                currentViewModel.IsInternetConnectionActive = false;
-                _networkIndicatorCount = 0;
-            }
-        }
+			await FaceApiClient.PersonGroup.TrainAsync(personGroupId).ConfigureAwait(false);
 
-        static async Task CreatePersonGroup()
-        {
-            try
-            {
-                await FaceServiceClient.CreatePersonGroupAsync(_personGroupId, _personGroupName);
-            }
-            catch (FaceAPIException e) when (e.HttpStatus.Equals(HttpStatusCode.Conflict))
-            {
+			do
+			{
+				trainingStatus = await FaceApiClient.PersonGroup.GetTrainingStatusAsync(_personGroupId).ConfigureAwait(false);
+			}
+			while (!(trainingStatus.Status == TrainingStatusType.Failed || trainingStatus.Status == TrainingStatusType.Succeeded));
 
-            }
-        }
-        #endregion
-    }
+			return trainingStatus;
+		}
+
+		static BaseViewModel GetCurrentViewModel()
+		{
+			Page currentPage;
+			if (Application.Current.MainPage.Navigation.ModalStack.Any())
+				currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
+			else
+				currentPage = Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
+
+			return currentPage.BindingContext as BaseViewModel;
+		}
+		#endregion
+	}
 }

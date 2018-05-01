@@ -52,7 +52,7 @@ namespace FacialRecognitionLogin
 
 			var file = await mediaFileTCS.Task.ConfigureAwait(false);
 
-            if (file == null)
+            if (file is null)
                 return null;
 
             return GetPhotoStream(file, false);
