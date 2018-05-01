@@ -3,42 +3,34 @@ using System;
 
 namespace FacialRecognitionLogin
 {
-    public abstract class BaseContentPage<T> : ContentPage where T : BaseViewModel, new()
-    {
-        #region Constant Fields
-        readonly Lazy<T> _viewModelHolder = new Lazy<T>();
-        #endregion
+	public abstract class BaseContentPage<T> : ContentPage where T : BaseViewModel, new()
+	{
+		#region Constructors
+		protected BaseContentPage() => BindingContext = ViewModel;
+		#endregion
 
-        #region Constructors
-        protected BaseContentPage()
-        {
-            BindingContext = ViewModel;
-            this.SetBinding(IsBusyProperty, nameof(ViewModel.IsInternetConnectionActive));
-        }
-        #endregion
+		#region Properties
+		protected T ViewModel { get; } = new T();
+		#endregion
 
-        #region Properties
-        protected T ViewModel => _viewModelHolder.Value;
-        #endregion
+		#region Methods
+		protected abstract void SubscribeEventHandlers();
 
-        #region Methods
-        protected abstract void SubscribeEventHandlers();
+		protected abstract void UnsubscribeEventHandlers();
 
-        protected abstract void UnsubscribeEventHandlers();
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
+			SubscribeEventHandlers();
+		}
 
-            SubscribeEventHandlers();
-        }
+		protected override void OnDisappearing()
+		{
+			base.OnDisappearing();
 
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-
-            UnsubscribeEventHandlers();
-        }
-        #endregion
-    }
+			UnsubscribeEventHandlers();
+		}
+		#endregion
+	}
 }

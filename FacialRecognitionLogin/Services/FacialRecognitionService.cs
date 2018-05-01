@@ -97,14 +97,16 @@ namespace FacialRecognitionLogin
 
 		static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
 		{
+			var viewModel = GetCurrentViewModel();
+
 			if (isActivityIndicatorDisplayed)
 			{
-				Application.Current.MainPage.IsBusy = true;
+				viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = true;
 				_networkIndicatorCount++;
 			}
 			else if (--_networkIndicatorCount <= 0)
 			{
-				Application.Current.MainPage.IsBusy = false;
+				viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = false;
 				_networkIndicatorCount = 0;
 			}
 		}
@@ -119,6 +121,17 @@ namespace FacialRecognitionLogin
 			{
 
 			}
+		}
+
+		static BaseViewModel GetCurrentViewModel()
+		{
+			Page currentPage;
+			if (Application.Current.MainPage.Navigation.ModalStack.Any())
+				currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
+			else
+				currentPage = Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
+
+			return currentPage.BindingContext as BaseViewModel;
 		}
 		#endregion
 	}

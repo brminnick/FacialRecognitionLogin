@@ -5,27 +5,41 @@ using System.Runtime.CompilerServices;
 
 namespace FacialRecognitionLogin
 {
-    public abstract class BaseViewModel : INotifyPropertyChanged
-    {
-        #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+	public abstract class BaseViewModel : INotifyPropertyChanged
+	{
+		#region Fields
+		bool _isInternetConnectionActive;
+		#endregion
 
-        #region Methods
-        protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return;
+		#region Events
+		public event PropertyChangedEventHandler PropertyChanged;
+		#endregion
 
-            backingStore = value;
+		#region Properties
+		public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
 
-            onChanged?.Invoke();
+		public bool IsInternetConnectionActive
+		{
+			get => _isInternetConnectionActive;
+			set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
+		}
+		#endregion
 
-            OnPropertyChanged(propertyname);
-        }
+		#region Methods
+		protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
+		{
+			if (EqualityComparer<T>.Default.Equals(backingStore, value))
+				return;
 
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        #endregion
-    }
+			backingStore = value;
+
+			onChanged?.Invoke();
+
+			OnPropertyChanged(propertyname);
+		}
+
+		protected void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		#endregion
+	}
 }
