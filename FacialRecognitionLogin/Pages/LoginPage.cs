@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 
-using EntryCustomReturn.Forms.Plugin.Abstractions;
-
 namespace FacialRecognitionLogin
 {
     public class LoginPage : BaseMediaContentPage<LoginViewModel>
@@ -33,24 +31,27 @@ namespace FacialRecognitionLogin
             _logoSlogan = new StyledLabel
             {
                 Opacity = 0,
-                Text = "Delighting Developers."
+                Text = "Delighting Developers.",
             };
-            _usernameEntry = new StyledEntry { Placeholder = "Username" };
+            _usernameEntry = new StyledEntry
+            {
+                Placeholder = "Username",
+                ReturnType = ReturnType.Next,
+                ReturnCommand = new Command(() => _passwordEntry.Focus())
+            };
             _usernameEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
-            CustomReturnEffect.SetReturnType(_usernameEntry, ReturnType.Next);
-            CustomReturnEffect.SetReturnCommand(_usernameEntry, new Command(() => _passwordEntry.Focus()));
 
             _passwordEntry = new StyledEntry
             {
                 Placeholder = "Password",
                 IsPassword = true,
+                ReturnType = ReturnType.Done
             };
             _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
-            _passwordEntry.SetBinding(CustomReturnEffect.ReturnCommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
-            CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
+            _passwordEntry.SetBinding(Entry.ReturnCommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _loginButton = new StyledButton(Borders.Thin) { Text = "Login" };
-			_loginButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
+            _loginButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _loginButton.SetBinding(Button.CommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _newUserSignUpButton = new StyledButton(Borders.None) { Text = "Sign-up" };
@@ -128,7 +129,7 @@ namespace FacialRecognitionLogin
         {
             base.SubscribeEventHandlers();
 
-			ViewModel.LoginFailed += HandleLoginFailed;
+            ViewModel.LoginFailed += HandleLoginFailed;
             ViewModel.LoginApproved += HandleLoginApproved;
             _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
         }
@@ -137,7 +138,7 @@ namespace FacialRecognitionLogin
         {
             base.UnsubscribeEventHandlers();
 
-			ViewModel.LoginFailed -= HandleLoginFailed;
+            ViewModel.LoginFailed -= HandleLoginFailed;
             ViewModel.LoginApproved -= HandleLoginApproved;
             _newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
         }

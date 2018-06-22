@@ -1,24 +1,24 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 
 using Xamarin.Forms;
-using System.Diagnostics;
 
 namespace FacialRecognitionLogin
 {
-	public static class FacialRecognitionService
+    public static class FacialRecognitionService
 	{
 		#region Constant Fields
 		const string _personGroupId = "persongroupid";
 		const string _personGroupName = "Facial Recognition Login Group";
 		static readonly Lazy<FaceAPI> _faceApiClientHolder = new Lazy<FaceAPI>(() =>
-																new FaceAPI(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { AzureRegion = AzureRegions.Westus });
+			new FaceAPI(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { AzureRegion = AzureRegions.Westus });
 		#endregion
 
 		#region Fields

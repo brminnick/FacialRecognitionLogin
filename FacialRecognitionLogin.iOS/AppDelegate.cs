@@ -9,7 +9,6 @@ namespace FacialRecognitionLogin.iOS
         public override bool FinishedLaunching(UIApplication uiApplication, NSDictionary launchOptions)
         {
             global::Xamarin.Forms.Forms.Init();
-            EntryCustomReturn.Forms.Plugin.iOS.CustomReturnEntryRenderer.Init();
 
             LoadApplication(new App());
 

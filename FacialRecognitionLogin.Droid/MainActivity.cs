@@ -4,6 +4,7 @@ using Android.Runtime;
 using Android.Content.PM;
 
 using Plugin.Permissions;
+using Plugin.CurrentActivity;
 
 namespace FacialRecognitionLogin.Droid
 {
@@ -23,8 +24,8 @@ namespace FacialRecognitionLogin.Droid
 
             base.OnCreate(savedInstanceState);
 
+            CrossCurrentActivity.Current.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            EntryCustomReturn.Forms.Plugin.Android.CustomReturnEntryRenderer.Init();
 
             LoadApplication(new App());
         }

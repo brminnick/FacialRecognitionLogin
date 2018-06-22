@@ -2,8 +2,6 @@
 
 using Xamarin.Forms;
 
-using EntryCustomReturn.Forms.Plugin.Abstractions;
-
 namespace FacialRecognitionLogin
 {
     public class NewUserSignUpPage : BaseMediaContentPage<NewUserSignUpViewModel>
@@ -24,10 +22,10 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Fill,
                 HorizontalTextAlignment = TextAlignment.End,
                 PlaceholderColor = Color.FromHex("749FA8"),
+                ReturnType = ReturnType.Next,
+                ReturnCommand = new Command(() => _passwordEntry.Focus())
             };
             _usernameEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
-            CustomReturnEffect.SetReturnType(_usernameEntry, ReturnType.Next);
-            CustomReturnEffect.SetReturnCommand(_usernameEntry, new Command(() => _passwordEntry.Focus()));
 
             _passwordEntry = new StyledEntry(1)
             {
@@ -36,11 +34,11 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Fill,
                 HorizontalTextAlignment = TextAlignment.End,
                 VerticalOptions = LayoutOptions.Fill,
-                PlaceholderColor = Color.FromHex("749FA8")
+                PlaceholderColor = Color.FromHex("749FA8"),
+                ReturnType = ReturnType.Done,
+                ReturnCommand = new Command(() => _passwordEntry.Unfocus())
             };
             _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
-            CustomReturnEffect.SetReturnType(_passwordEntry, ReturnType.Done);
-            CustomReturnEffect.SetReturnCommand(_passwordEntry, new Command(_passwordEntry.Unfocus));
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
