@@ -17,8 +17,8 @@ namespace FacialRecognitionLogin
 		#region Constant Fields
 		const string _personGroupId = "persongroupid";
 		const string _personGroupName = "Facial Recognition Login Group";
-		static readonly Lazy<FaceAPI> _faceApiClientHolder = new Lazy<FaceAPI>(() =>
-			new FaceAPI(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { AzureRegion = AzureRegions.Westus });
+        readonly static Lazy<FaceClient> _faceApiClientHolder =
+            new Lazy<FaceClient>(() => new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { BaseUri = new Uri("https://westus.api.cognitive.microsoft.com/face/v1.0") });
 		#endregion
 
 		#region Fields
@@ -26,7 +26,7 @@ namespace FacialRecognitionLogin
 		#endregion
 
 		#region Properties
-		static FaceAPI FaceApiClient => _faceApiClientHolder.Value;
+        static FaceClient FaceApiClient => _faceApiClientHolder.Value;
 		#endregion
 
 		#region Methods
