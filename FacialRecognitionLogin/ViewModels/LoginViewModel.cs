@@ -20,7 +20,7 @@ namespace FacialRecognitionLogin
 
         #region Properties
         public ICommand LoginButtonTappedCommand => _loginButtonTappedCommand ??
-            (_loginButtonTappedCommand = new Command(async () => await ExecuteLoginButtonTappedCommand()));
+            (_loginButtonTappedCommand = new Command(async () => await ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText)));
 
         public string UsernameEntryText
         {
@@ -36,15 +36,15 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        async Task ExecuteLoginButtonTappedCommand()
+        async Task ExecuteLoginButtonTappedCommand(string usernameEntryText, string passwordEntryText)
         {
-            if (string.IsNullOrWhiteSpace(UsernameEntryText) || string.IsNullOrWhiteSpace(PasswordEntryText))
+            if (string.IsNullOrWhiteSpace(usernameEntryText) || string.IsNullOrWhiteSpace(passwordEntryText))
             {
                 OnLoginFailed("Username and Password cannot be empty", false);
                 return;
             }
 
-            var isUsernamePasswordCorrect = await DependencyService.Get<ILogin>().CheckLogin(UsernameEntryText, PasswordEntryText);
+            var isUsernamePasswordCorrect = await DependencyService.Get<ILogin>().CheckLogin(usernameEntryText, passwordEntryText);
 
             if (!isUsernamePasswordCorrect)
             {
@@ -54,13 +54,13 @@ namespace FacialRecognitionLogin
 
             var photoStream = await PhotoService.GetPhotoStreamFromCamera();
 
-            if(photoStream is null)
+            if (photoStream is null)
             {
                 OnLoginFailed("Facial Recognition Required", false);
                 return;
             }
 
-            var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(UsernameEntryText, photoStream);
+            var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, photoStream);
 
             if (isFaceRecognized)
                 OnLoginApproved();
@@ -69,7 +69,7 @@ namespace FacialRecognitionLogin
         }
 
         void OnLoginFailed(string errorMessage, bool shouldDisplaySignUpPrompt) =>
-            LoginFailed?.Invoke(this, new LoginFailedEventArgs(errorMessage,shouldDisplaySignUpPrompt));
+            LoginFailed?.Invoke(this, new LoginFailedEventArgs(errorMessage, shouldDisplaySignUpPrompt));
 
         void OnLoginApproved() =>
             LoginApproved?.Invoke(this, EventArgs.Empty);
