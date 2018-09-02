@@ -2,7 +2,10 @@
 {
     public static class AzureConstants
     {
-#warning Create your own API Key Here: https://aka.ms/Axnics
-        public const string FacialRecognitionAPIKey = "1034a4230bee4c6d962032cf5ce82766";
+#Error Missing API Key Here. Create API Key Here: https://aka.ms/Axnics
+        public const string FacialRecognitionAPIKey = "Enter Your API Key";
+
+        //FaceApi example: https://westus.api.cognitive.microsoft.com/
+        public const string FaceApiBaseUrl = "Enter Your Face Api Base Url";
     }
 }
