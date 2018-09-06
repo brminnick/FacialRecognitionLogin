@@ -99,7 +99,7 @@ namespace FacialRecognitionLogin
                 await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID).ConfigureAwait(false);
         }
 
-        async Task WaitForNewUserSignUpPageToDisappear() => await Task.Delay(1000);
+        Task WaitForNewUserSignUpPageToDisappear() => Task.Delay(1000);
 
         void OnTakePhotoFailed(string errorMessage) =>
             TakePhotoFailed?.Invoke(this, errorMessage);
