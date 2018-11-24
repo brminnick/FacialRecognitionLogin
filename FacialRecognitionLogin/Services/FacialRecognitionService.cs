@@ -17,8 +17,8 @@ namespace FacialRecognitionLogin
         #region Constant Fields
         const string _personGroupId = "persongroupid";
         const string _personGroupName = "Facial Recognition Login Group";
-        readonly static Lazy<FaceClient> _faceApiClientHolder =
-            new Lazy<FaceClient>(() => new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { Endpoint = AzureConstants.FaceApiBaseUrl });
+        readonly static Lazy<FaceClient> _faceApiClientHolder = new Lazy<FaceClient>(() =>
+             new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { Endpoint = AzureConstants.FaceApiBaseUrl });
         #endregion
 
         #region Fields
@@ -33,6 +33,7 @@ namespace FacialRecognitionLogin
         public static async Task RemoveExistingFace(Guid userId)
         {
             UpdateActivityIndicatorStatus(true);
+
             try
             {
                 await FaceApiClient.PersonGroupPerson.DeleteAsync(_personGroupId, userId).ConfigureAwait(false);
@@ -75,6 +76,7 @@ namespace FacialRecognitionLogin
         public static async Task<bool> IsFaceIdentified(string username, Stream photo)
         {
             UpdateActivityIndicatorStatus(true);
+
             try
             {
                 var personGroupListTask = FaceApiClient.PersonGroupPerson.ListAsync(_personGroupId);
@@ -141,7 +143,7 @@ namespace FacialRecognitionLogin
             {
                 trainingStatus = await FaceApiClient.PersonGroup.GetTrainingStatusAsync(_personGroupId).ConfigureAwait(false);
             }
-            while (!(trainingStatus.Status == TrainingStatusType.Failed || trainingStatus.Status == TrainingStatusType.Succeeded));
+            while (!(trainingStatus.Status is TrainingStatusType.Failed || trainingStatus.Status is TrainingStatusType.Succeeded));
 
             return trainingStatus;
         }
@@ -149,6 +151,7 @@ namespace FacialRecognitionLogin
         static BaseViewModel GetCurrentViewModel()
         {
             Page currentPage;
+
             if (Application.Current.MainPage.Navigation.ModalStack.Any())
                 currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
             else

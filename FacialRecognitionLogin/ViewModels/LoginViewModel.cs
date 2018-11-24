@@ -2,7 +2,7 @@
 using System.Windows.Input;
 using System.Threading.Tasks;
 
-using Xamarin.Forms;
+using AsyncAwaitBestPractices.MVVM;
 
 namespace FacialRecognitionLogin
 {
@@ -20,7 +20,7 @@ namespace FacialRecognitionLogin
 
         #region Properties
         public ICommand LoginButtonTappedCommand => _loginButtonTappedCommand ??
-            (_loginButtonTappedCommand = new Command(async () => await ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText)));
+            (_loginButtonTappedCommand = new AsyncCommand(() => ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText), false));
 
         public string UsernameEntryText
         {
@@ -44,7 +44,7 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var isUsernamePasswordCorrect = await DependencyService.Get<ILogin>().CheckLogin(usernameEntryText, passwordEntryText);
+            var isUsernamePasswordCorrect = await Xamarin.Forms.DependencyService.Get<ILogin>().CheckLogin(usernameEntryText, passwordEntryText);
 
             if (!isUsernamePasswordCorrect)
             {

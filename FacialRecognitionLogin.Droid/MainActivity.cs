@@ -28,6 +28,8 @@ namespace FacialRecognitionLogin.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
             LoadApplication(new App());
+
+            Window.SetFlags(Android.Views.WindowManagerFlags.Secure, Android.Views.WindowManagerFlags.Secure);
         }
     }
 }
