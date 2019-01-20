@@ -127,6 +127,9 @@
     <Reference Include="AsyncAwaitBestPractices.MVVM">
       <HintPath>..\packages\AsyncAwaitBestPractices.MVVM.2.1.0\lib\netstandard\AsyncAwaitBestPractices.MVVM.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Essentials">
+      <HintPath>..\packages\Xamarin.Essentials.1.0.1\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -135,7 +138,6 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="CustomRenderers\" />
-    <Folder Include="Services\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +152,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="CustomRenderers\StyledEntryRenderer.cs" />
-    <Compile Include="Services\Login_iOS.cs" />
     <Compile Include="Helpers\KeychainHelpers.cs" />
   </ItemGroup>
   <ItemGroup>

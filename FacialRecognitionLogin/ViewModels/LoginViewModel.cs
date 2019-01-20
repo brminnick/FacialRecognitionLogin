@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AsyncAwaitBestPractices;
 using AsyncAwaitBestPractices.MVVM;
 
+using Xamarin.Essentials;
+
 namespace FacialRecognitionLogin
 {
     public class LoginViewModel : BaseViewModel
@@ -59,28 +61,30 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var isUsernamePasswordCorrect = await Xamarin.Forms.DependencyService.Get<ILogin>().CheckLogin(usernameEntryText, passwordEntryText);
+            var isLoginValid = await SecureStorageService.IsLoginCorrect(usernameEntryText, passwordEntryText).ConfigureAwait(false);
 
-            if (!isUsernamePasswordCorrect)
+            if (isLoginValid)
+            {
+                var photoStream = await PhotoService.GetPhotoStreamFromCamera().ConfigureAwait(false);
+
+                if (photoStream is null)
+                {
+                    OnLoginFailed("Facial Recognition Required", false);
+                }
+                else
+                {
+                    var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, photoStream).ConfigureAwait(false);
+
+                    if (isFaceRecognized)
+                        OnLoginApproved();
+                    else
+                        OnLoginFailed("Face not recognized", true);
+                }
+            }
+            else
             {
                 OnLoginFailed("Username / Password Invalid", true);
-                return;
             }
-
-            var photoStream = await PhotoService.GetPhotoStreamFromCamera();
-
-            if (photoStream is null)
-            {
-                OnLoginFailed("Facial Recognition Required", false);
-                return;
-            }
-
-            var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, photoStream);
-
-            if (isFaceRecognized)
-                OnLoginApproved();
-            else
-                OnLoginFailed("Face not recognized", true);
         }
 
         void OnLoginFailed(string errorMessage, bool shouldDisplaySignUpPrompt) =>

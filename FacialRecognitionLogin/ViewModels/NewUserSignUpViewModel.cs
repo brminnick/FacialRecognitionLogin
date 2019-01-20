@@ -105,14 +105,25 @@ namespace FacialRecognitionLogin
             if (FontAwesomeLabelText.Equals(FontAwesomeIcon.EmptyBox.ToString()))
             {
                 OnSaveFailed("Photo Required for Facial Recognition");
-                return;
             }
-
-            var isUserNamePasswordValid = await DependencyService.Get<ILogin>().SetPasswordForUsername(username, password).ConfigureAwait(false);
-            if (isUserNamePasswordValid)
-                OnSaveSuccessfullyCompleted();
-            else
+            else if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
                 OnSaveFailed("Username / Password Empty");
+            }
+            else
+            {
+                try
+                {
+                    await SecureStorageService.SaveLogin(username, password).ConfigureAwait(false);
+
+                    OnSaveSuccessfullyCompleted();
+                }
+                catch (Exception e)
+                {
+                    DebugService.PrintException(e);
+                    OnSaveFailed("Save Failed");
+                }
+            }
         }
 
         async Task ExecuteCancelButtonCommand()
