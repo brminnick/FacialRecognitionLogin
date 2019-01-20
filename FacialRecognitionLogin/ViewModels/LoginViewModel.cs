@@ -20,7 +20,7 @@ namespace FacialRecognitionLogin
 
         #region Properties
         public ICommand LoginButtonTappedCommand => _loginButtonTappedCommand ??
-            (_loginButtonTappedCommand = new AsyncCommand(() => ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText), false));
+            (_loginButtonTappedCommand = new AsyncCommand(() => ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText), continueOnCapturedContext: false));
 
         public string UsernameEntryText
         {
