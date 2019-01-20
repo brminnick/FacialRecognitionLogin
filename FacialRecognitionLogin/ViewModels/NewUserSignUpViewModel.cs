@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using AsyncAwaitBestPractices;
+using AsyncAwaitBestPractices.MVVM;
 
 using Xamarin.Forms;
 
@@ -8,6 +12,12 @@ namespace FacialRecognitionLogin
 {
     public class NewUserSignUpViewModel : BaseViewModel
     {
+        #region Constant Fields
+        readonly WeakEventManager _saveSuccessfullyCompletedEventManager = new WeakEventManager();
+        readonly WeakEventManager<string> _takePhotoFailedEventManager = new WeakEventManager<string>();
+        readonly WeakEventManager<string> _saveFailedEventManager = new WeakEventManager<string>();
+        #endregion
+
         #region Fields
         Guid _facialRecognitionUserGUID;
         string _usernameEntryText, _passwordEntryText, _fontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
@@ -15,20 +25,34 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Events
-        public event EventHandler<string> TakePhotoFailed;
-        public event EventHandler<string> SaveFailed;
-        public event EventHandler SaveSuccessfullyCompleted;
+        public event EventHandler SaveSuccessfullyCompleted
+        {
+            add => _saveSuccessfullyCompletedEventManager.AddEventHandler(value);
+            remove => _saveSuccessfullyCompletedEventManager.RemoveEventHandler(value);
+        }
+
+        public event EventHandler<string> TakePhotoFailed
+        {
+            add => _takePhotoFailedEventManager.AddEventHandler(value);
+            remove => _takePhotoFailedEventManager.RemoveEventHandler(value);
+        }
+
+        public event EventHandler<string> SaveFailed
+        {
+            add => _saveFailedEventManager.AddEventHandler(value);
+            remove => _saveFailedEventManager.RemoveEventHandler(value);
+        }
         #endregion
 
         #region Properties
         public ICommand CancelButtonCommand => _cancelButtonCommand ??
-            (_cancelButtonCommand = new Command(async () => await ExecuteCancelButtonCommand()));
+            (_cancelButtonCommand = new AsyncCommand(ExecuteCancelButtonCommand, continueOnCapturedContext: false));
 
         public ICommand TakePhotoButtonCommand => _takePhotoButtonCommand ??
-            (_takePhotoButtonCommand = new Command(async () => await ExecuteTakePhotoButtonCommand(UsernameEntryText)));
+            (_takePhotoButtonCommand = new AsyncCommand(() => ExecuteTakePhotoButtonCommand(UsernameEntryText), continueOnCapturedContext: false));
 
         public ICommand SaveButtonCommand => _saveButtonCommand ??
-            (_saveButtonCommand = new Command(async () => await ExecuteSaveButtonCommand(UsernameEntryText, PasswordEntryText)));
+            (_saveButtonCommand = new AsyncCommand(() => ExecuteSaveButtonCommand(UsernameEntryText, PasswordEntryText), continueOnCapturedContext: false));
 
         public string UsernameEntryText
         {
@@ -60,13 +84,13 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var photoStream = await PhotoService.GetPhotoStreamFromCamera();
+            var photoStream = await PhotoService.GetPhotoStreamFromCamera().ConfigureAwait(false);
             if (photoStream is null)
                 return;
 
             try
             {
-                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream);
+                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream).ConfigureAwait(false);
                 FontAwesomeLabelText = FontAwesomeIcon.CheckedBox.ToString();
             }
             catch (Exception e)
@@ -84,7 +108,7 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var isUserNamePasswordValid = await DependencyService.Get<ILogin>().SetPasswordForUsername(username, password);
+            var isUserNamePasswordValid = await DependencyService.Get<ILogin>().SetPasswordForUsername(username, password).ConfigureAwait(false);
             if (isUserNamePasswordValid)
                 OnSaveSuccessfullyCompleted();
             else
@@ -93,22 +117,28 @@ namespace FacialRecognitionLogin
 
         async Task ExecuteCancelButtonCommand()
         {
-            await WaitForNewUserSignUpPageToDisappear();
+            await WaitForNewUserSignUpPageToDisappear().ConfigureAwait(false);
 
             if (!_facialRecognitionUserGUID.Equals(default(Guid)))
                 await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID).ConfigureAwait(false);
         }
 
-        Task WaitForNewUserSignUpPageToDisappear() => Task.Delay(1000);
+        async Task WaitForNewUserSignUpPageToDisappear()
+        {
+            while (Application.Current.MainPage.Navigation.ModalStack.OfType<NewUserSignUpPage>().Any())
+            {
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+        }
 
         void OnTakePhotoFailed(string errorMessage) =>
-            TakePhotoFailed?.Invoke(this, errorMessage);
+            _takePhotoFailedEventManager?.HandleEvent(this, errorMessage, nameof(TakePhotoFailed));
 
         void OnSaveFailed(string errorMessage) =>
-            SaveFailed?.Invoke(this, errorMessage);
+            _saveFailedEventManager?.HandleEvent(this, errorMessage, nameof(SaveFailed));
 
         void OnSaveSuccessfullyCompleted() =>
-            SaveSuccessfullyCompleted?.Invoke(this, EventArgs.Empty);
+            _saveSuccessfullyCompletedEventManager?.HandleEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
         #endregion
     }
 }

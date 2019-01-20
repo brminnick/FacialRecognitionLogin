@@ -15,7 +15,6 @@
     <Folder Include="Pages\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Login\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Constants\" />

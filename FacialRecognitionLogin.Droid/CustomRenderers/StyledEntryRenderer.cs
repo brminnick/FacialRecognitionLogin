@@ -1,5 +1,4 @@
-﻿using Android.Widget;
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 
 using Xamarin.Forms;
@@ -24,11 +23,8 @@ namespace FacialRecognitionLogin.Droid
 
             if (e.NewElement != null)
             {
-                var droidEditText = Control as EditText;
-                droidEditText.SetHintTextColor(Xamarin.Forms.Color.White.ToAndroid());
-
-                Typeface font = Typeface.Create("Droid Sans Mono", TypefaceStyle.Normal);
-                droidEditText.Typeface = font;
+                Control.SetHintTextColor(Xamarin.Forms.Color.White.ToAndroid());
+                Control.Typeface = Typeface.Create(App.GetDefaultFontFamily(), TypefaceStyle.Normal);
             }
         }
     }

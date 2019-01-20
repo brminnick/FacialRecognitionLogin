@@ -6,10 +6,6 @@ namespace FacialRecognitionLogin
 {
 	public class SuccessPage : ContentPage
 	{
-		#region Constant Fields
-		readonly Button _logoutButton;
-		#endregion
-
 		#region Constructors
 		public SuccessPage()
 		{
@@ -24,36 +20,23 @@ namespace FacialRecognitionLogin
 				Text = "Login Successful"
 			};
 
-			_logoutButton = new StyledButton(Borders.Thin, 1) { Text = "Logout" };
+			var logoutButton = new StyledButton(Borders.Thin, 1) { Text = "Logout" };
+            logoutButton.Clicked += HandleLogoutButtonClicked;
 
-			Content = new StackLayout
+            Content = new StackLayout
 			{
 				Spacing = 35,
 				VerticalOptions = LayoutOptions.Center,
 				HorizontalOptions = LayoutOptions.Center,
 				Children = {
 					successLabel,
-					_logoutButton
+					logoutButton
 				}
 			};
 		}
 		#endregion
 
 		#region Methods
-		protected override void OnAppearing()
-		{
-			base.OnAppearing();
-
-			_logoutButton.Clicked += HandleLogoutButtonClicked;
-		}
-
-		protected override void OnDisappearing()
-		{
-			base.OnDisappearing();
-
-			_logoutButton.Clicked -= HandleLogoutButtonClicked;
-		}
-
 		void HandleLogoutButtonClicked(object sender, EventArgs e) => App.InitializeMainPage();
 
 		Thickness GetPagePadding()

@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using System;
+using Xamarin.Forms;
 
 namespace FacialRecognitionLogin
 {
@@ -21,6 +22,19 @@ namespace FacialRecognitionLogin
 
                 NavigationPage.SetHasNavigationBar(loginPage, false);
             });
+        }
+
+        public static string GetDefaultFontFamily()
+        {
+            switch (Device.RuntimePlatform)
+            {
+                case Device.iOS:
+                    return "AppleSDGothicNeo-Light";
+                case Device.Android:
+                    return "Droid Sans Mono";
+                default:
+                    throw new NotSupportedException("Platform Not Supported");
+            }
         }
 
         protected override void OnStart()

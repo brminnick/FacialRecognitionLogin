@@ -21,6 +21,9 @@ namespace FacialRecognitionLogin
         #region Constructors
         public LoginPage()
         {
+            ViewModel.LoginFailed += HandleLoginFailed;
+            ViewModel.LoginApproved += HandleLoginApproved;
+
             BackgroundColor = Color.FromHex("#3498db");
             Padding = GetPagePadding();
 
@@ -53,6 +56,7 @@ namespace FacialRecognitionLogin
             _loginButton.SetBinding(Button.CommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _newUserSignUpButton = new StyledButton(Borders.None) { Text = "Sign-up" };
+            _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
             _newUserSignUpButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
 
             var activityIndicator = new ActivityIndicator { Color = Color.White };
@@ -125,24 +129,6 @@ namespace FacialRecognitionLogin
             }
         }
 
-        protected override void SubscribeEventHandlers()
-        {
-            base.SubscribeEventHandlers();
-
-            ViewModel.LoginFailed += HandleLoginFailed;
-            ViewModel.LoginApproved += HandleLoginApproved;
-            _newUserSignUpButton.Clicked += HandleNewUserSignUpButtonClicked;
-        }
-
-        protected override void UnsubscribeEventHandlers()
-        {
-            base.UnsubscribeEventHandlers();
-
-            ViewModel.LoginFailed -= HandleLoginFailed;
-            ViewModel.LoginApproved -= HandleLoginApproved;
-            _newUserSignUpButton.Clicked -= HandleNewUserSignUpButtonClicked;
-        }
-
         void AnimateLoginPage()
         {
             Device.BeginInvokeOnMainThread(async () =>
@@ -190,7 +176,6 @@ namespace FacialRecognitionLogin
                     default:
                         await DisplayAlert("Error", e.ErrorMessage, "OK");
                         break;
-
                 }
             });
         }

@@ -9,26 +9,18 @@ namespace FacialRecognitionLogin
     {
         #region Constant Fields
         readonly StyledButton _saveUsernameButton, _cancelButton, _takePhotoButton;
-        readonly StyledEntry _usernameEntry, _passwordEntry;
         #endregion
 
         #region Constructos
         public NewUserSignUpPage()
         {
+            ViewModel.SaveFailed += HandleSaveFailed;
+            ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
+            ViewModel.SaveSuccessfullyCompleted += HandleSaveSuccessfullyCompleted;
+
             BackgroundColor = Color.FromHex("2980b9");
 
-            _usernameEntry = new StyledEntry(1)
-            {
-                Placeholder = "Username",
-                HorizontalOptions = LayoutOptions.Fill,
-                HorizontalTextAlignment = TextAlignment.End,
-                PlaceholderColor = Color.FromHex("749FA8"),
-                ReturnType = ReturnType.Next,
-                ReturnCommand = new Command(() => _passwordEntry.Focus())
-            };
-            _usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
-
-            _passwordEntry = new StyledEntry(1)
+            var passwordEntry = new StyledEntry(1)
             {
                 Placeholder = "Password",
                 IsPassword = true,
@@ -36,10 +28,21 @@ namespace FacialRecognitionLogin
                 HorizontalTextAlignment = TextAlignment.End,
                 VerticalOptions = LayoutOptions.Fill,
                 PlaceholderColor = Color.FromHex("749FA8"),
-                ReturnType = ReturnType.Done,
-                ReturnCommand = new Command(() => _passwordEntry.Unfocus())
+                ReturnType = ReturnType.Done
             };
-            _passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+            passwordEntry.ReturnCommand = new Command(() => passwordEntry.Unfocus());
+            passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+
+            var usernameEntry = new StyledEntry(1)
+            {
+                Placeholder = "Username",
+                HorizontalOptions = LayoutOptions.Fill,
+                HorizontalTextAlignment = TextAlignment.End,
+                PlaceholderColor = Color.FromHex("749FA8"),
+                ReturnType = ReturnType.Next,
+                ReturnCommand = new Command(() => passwordEntry.Focus())
+            };
+            usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
@@ -56,6 +59,7 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.End
             };
+            _cancelButton.Clicked += HandleCancelButtonClicked;
             _cancelButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _cancelButton.SetBinding(Button.CommandProperty, nameof(ViewModel.CancelButtonCommand));
 
@@ -118,7 +122,7 @@ namespace FacialRecognitionLogin
                         HorizontalOptions = LayoutOptions.Start
                     },
 
-                    _usernameEntry,
+                    usernameEntry,
 
                     new Label
                     {
@@ -127,7 +131,7 @@ namespace FacialRecognitionLogin
                         HorizontalOptions = LayoutOptions.Start
                     },
 
-                    _passwordEntry,
+                    passwordEntry,
                     _takePhotoButton,
                     facialRecognitionStackLayout,
                 }
@@ -154,26 +158,6 @@ namespace FacialRecognitionLogin
         #endregion
 
         #region Methods
-        protected override void SubscribeEventHandlers()
-        {
-            base.SubscribeEventHandlers();
-
-            ViewModel.SaveFailed += HandleSaveFailed;
-            _cancelButton.Clicked += HandleCancelButtonClicked;
-            ViewModel.TakePhotoFailed += HandleTakePhotoFailed;
-            ViewModel.SaveSuccessfullyCompleted += HandleSaveSuccessfullyCompleted;
-        }
-
-        protected override void UnsubscribeEventHandlers()
-        {
-            base.UnsubscribeEventHandlers();
-
-            ViewModel.SaveFailed -= HandleSaveFailed;
-            _cancelButton.Clicked -= HandleCancelButtonClicked;
-            ViewModel.TakePhotoFailed -= HandleTakePhotoFailed;
-            ViewModel.SaveSuccessfullyCompleted -= HandleSaveSuccessfullyCompleted;
-        }
-
         protected override void LayoutChildren(double x, double y, double width, double height)
         {
             _cancelButton.WidthRequest = width - 40;

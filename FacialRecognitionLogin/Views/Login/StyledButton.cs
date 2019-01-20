@@ -1,4 +1,5 @@
 ﻿using Xamarin.Forms;
+using System;
 
 namespace FacialRecognitionLogin
 {
@@ -16,17 +17,21 @@ namespace FacialRecognitionLogin
 			TextColor = Color.White;
 			FontSize = 18;
 			Opacity = opacity;
-			FontFamily = StyleHelpers.GetFontFamily();
+			FontFamily = App.GetDefaultFontFamily();
 
 			switch (border)
 			{
 				case Borders.None:
 					break;
+
 				case Borders.Thin:
 					CornerRadius = 3;
 					BorderColor = Color.White;
 					BorderWidth = 1;
 					break;
+
+                default:
+                    throw new NotSupportedException($"{nameof(Borders)}.{border.ToString()} Not Supported");
 			}
 		}
 	}

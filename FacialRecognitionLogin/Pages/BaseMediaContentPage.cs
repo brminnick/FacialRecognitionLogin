@@ -8,16 +8,10 @@ namespace FacialRecognitionLogin
 {
     public abstract class BaseMediaContentPage<T> : BaseContentPage<T> where T : BaseViewModel, new()
     {
-        protected override void SubscribeEventHandlers()
+        protected BaseMediaContentPage()
         {
             PhotoService.PermissionsDenied += HandlePermissionsDenied;
             PhotoService.NoCameraDetected += HandleNoPhotoDetected;
-        }
-
-        protected override void UnsubscribeEventHandlers()
-        {
-            PhotoService.PermissionsDenied -= HandlePermissionsDenied;
-            PhotoService.NoCameraDetected -= HandleNoPhotoDetected;
         }
 
         void HandlePermissionsDenied(object sender, EventArgs e)

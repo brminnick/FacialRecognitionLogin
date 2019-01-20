@@ -1,5 +1,4 @@
 ﻿using Xamarin.Forms;
-using System;
 
 namespace FacialRecognitionLogin
 {
@@ -11,26 +10,6 @@ namespace FacialRecognitionLogin
 
 		#region Properties
 		protected T ViewModel { get; } = new T();
-		#endregion
-
-		#region Methods
-		protected abstract void SubscribeEventHandlers();
-
-		protected abstract void UnsubscribeEventHandlers();
-
-		protected override void OnAppearing()
-		{
-			base.OnAppearing();
-
-			SubscribeEventHandlers();
-		}
-
-		protected override void OnDisappearing()
-		{
-			base.OnDisappearing();
-
-			UnsubscribeEventHandlers();
-		}
 		#endregion
 	}
 }

@@ -3,43 +3,53 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+using AsyncAwaitBestPractices;
+
 namespace FacialRecognitionLogin
 {
-	public abstract class BaseViewModel : INotifyPropertyChanged
-	{
-		#region Fields
-		bool _isInternetConnectionActive;
-		#endregion
+    public abstract class BaseViewModel : INotifyPropertyChanged
+    {
+        #region Constant Fields
+        readonly WeakEventManager _notifyPropertyChangedEventManager = new WeakEventManager();
+        #endregion
 
-		#region Events
-		public event PropertyChangedEventHandler PropertyChanged;
-		#endregion
+        #region Fields
+        bool _isInternetConnectionActive;
+        #endregion
 
-		#region Properties
-		public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
+        #region Events
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add => _notifyPropertyChangedEventManager.AddEventHandler(value);
+            remove => _notifyPropertyChangedEventManager.RemoveEventHandler(value);
+        }
+        #endregion
 
-		public bool IsInternetConnectionActive
-		{
-			get => _isInternetConnectionActive;
-			set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
-		}
-		#endregion
+        #region Properties
+        public bool IsInternetConnectionInactive => !IsInternetConnectionActive;
 
-		#region Methods
-		protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
-		{
-			if (EqualityComparer<T>.Default.Equals(backingStore, value))
-				return;
+        public bool IsInternetConnectionActive
+        {
+            get => _isInternetConnectionActive;
+            set => SetProperty(ref _isInternetConnectionActive, value, () => OnPropertyChanged(nameof(IsInternetConnectionInactive)));
+        }
+        #endregion
 
-			backingStore = value;
+        #region Methods
+        protected void SetProperty<T>(ref T backingStore, T value, Action onChanged = null, [CallerMemberName] string propertyname = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return;
 
-			onChanged?.Invoke();
+            backingStore = value;
 
-			OnPropertyChanged(propertyname);
-		}
+            onChanged?.Invoke();
 
-		protected void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		#endregion
-	}
+            OnPropertyChanged(propertyname);
+        }
+
+        void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
+            _notifyPropertyChangedEventManager?.HandleEvent(this, new PropertyChangedEventArgs(propertyName), nameof(INotifyPropertyChanged.PropertyChanged));
+        #endregion
+    }
 }

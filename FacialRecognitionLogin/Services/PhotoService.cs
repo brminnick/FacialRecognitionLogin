@@ -2,9 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using AsyncAwaitBestPractices;
+
 using Plugin.Media;
 using Plugin.Media.Abstractions;
-
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 
@@ -14,9 +15,22 @@ namespace FacialRecognitionLogin
 {
     public static class PhotoService
     {
+        #region Constant Fields
+        readonly static WeakEventManager _noCameraDetectedEventManager = new WeakEventManager();
+        readonly static WeakEventManager _permissionsDeniedEventManager = new WeakEventManager();
+        #endregion
+
         #region Events
-        public static event EventHandler NoCameraDetected;
-        public static event EventHandler PermissionsDenied;
+        public static event EventHandler NoCameraDetected
+        {
+            add => _noCameraDetectedEventManager.AddEventHandler(value);
+            remove => _noCameraDetectedEventManager.RemoveEventHandler(value);
+        }
+        public static event EventHandler PermissionsDenied
+        {
+            add => _permissionsDeniedEventManager.AddEventHandler(value);
+            remove => _permissionsDeniedEventManager.RemoveEventHandler(value);
+        }
         #endregion
 
         #region Methods
@@ -48,9 +62,9 @@ namespace FacialRecognitionLogin
                 }).ConfigureAwait(false);
 
                 mediaFileTCS.SetResult(mediaFile);
-            }); 
+            });
 
-			var file = await mediaFileTCS.Task.ConfigureAwait(false);
+            var file = await mediaFileTCS.Task.ConfigureAwait(false);
 
             if (file is null)
                 return null;
@@ -80,14 +94,17 @@ namespace FacialRecognitionLogin
                 storageStatus = results[Permission.Storage];
             }
 
-            if (cameraStatus == PermissionStatus.Granted && storageStatus == PermissionStatus.Granted)
+            if (cameraStatus is PermissionStatus.Granted
+                    && storageStatus is PermissionStatus.Granted)
+            {
                 return true;
+            }
 
             return false;
         }
 
-        static void OnNoCameraDetected() => NoCameraDetected?.Invoke(null, EventArgs.Empty);
-        static void OnPermissionsDenied() => PermissionsDenied?.Invoke(null, EventArgs.Empty);
+        static void OnNoCameraDetected() => _noCameraDetectedEventManager.HandleEvent(null, EventArgs.Empty, nameof(NoCameraDetected));
+        static void OnPermissionsDenied() => _permissionsDeniedEventManager.HandleEvent(null, EventArgs.Empty, nameof(PermissionsDenied));
         #endregion
     }
 }

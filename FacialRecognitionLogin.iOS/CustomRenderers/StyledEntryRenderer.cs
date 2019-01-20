@@ -14,9 +14,8 @@ namespace FacialRecognitionLogin.iOS
 {
     public class StyledEntryRenderer : EntryRenderer
     {
-        #region Fields
-        UITextField _nativeTextField;
-        bool _isInitialized;
+        #region Constant Fields
+        const int _defaultFontSize = 18;
         #endregion
 
         #region Methods
@@ -24,12 +23,12 @@ namespace FacialRecognitionLogin.iOS
         {
             base.OnElementPropertyChanged(sender, e);
 
-            if (e.PropertyName == "IsEnabled")
+            if (e.PropertyName is nameof(View.IsEnabled))
             {
-                if (!_nativeTextField.Enabled)
-                    _nativeTextField.TextColor = UIColor.White;
+                if (!Control.Enabled)
+                    Control.TextColor = UIColor.White;
                 else
-                    _nativeTextField.TextColor = UIColor.Blue;
+                    Control.TextColor = UIColor.Blue;
             }
         }
 
@@ -37,17 +36,15 @@ namespace FacialRecognitionLogin.iOS
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement != null && !_isInitialized)
+            if (e.NewElement != null && !Control.Font.FamilyName.Equals(App.GetDefaultFontFamily()))
             {
                 var formsEntry = e.NewElement as StyledEntry;
-                _nativeTextField = Control as UITextField;
-                _nativeTextField.Font = UIFont.FromName("AppleSDGothicNeo-Light", 18);
-                _nativeTextField.TextColor = UIColor.White;
+
+                Control.Font = UIFont.FromName(App.GetDefaultFontFamily(), _defaultFontSize);
+                Control.TextColor = UIColor.White;
 
                 if (!string.IsNullOrEmpty(formsEntry.Placeholder))
-                    _nativeTextField.AttributedPlaceholder = new NSAttributedString(formsEntry.Placeholder, UIFont.FromName("AppleSDGothicNeo-Light", 18), UIColor.White);
-
-                _isInitialized = true;
+                    Control.AttributedPlaceholder = new NSAttributedString(formsEntry.Placeholder, UIFont.FromName(App.GetDefaultFontFamily(), _defaultFontSize), UIColor.White);
             }
         }
         #endregion

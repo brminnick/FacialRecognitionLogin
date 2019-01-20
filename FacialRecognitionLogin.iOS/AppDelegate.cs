@@ -21,15 +21,18 @@ namespace FacialRecognitionLogin.iOS
         {
             base.OnActivated(uiApplication);
 
-            _blurWindow?.RemoveFromSuperview();
-            _blurWindow?.Dispose();
-            _blurWindow = null;
+            RemoveBlurOverlay();
         }
 
         public override void OnResignActivation(UIApplication uiApplication)
         {
             base.OnResignActivation(uiApplication);
 
+            AddBlurOverlay();
+        }
+
+        void AddBlurOverlay()
+        {
             using (var blurEffect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light))
             {
                 _blurWindow = new UIVisualEffectView(blurEffect)
@@ -39,6 +42,13 @@ namespace FacialRecognitionLogin.iOS
             }
 
             UIApplication.SharedApplication.KeyWindow.RootViewController.View.AddSubview(_blurWindow);
+        }
+
+        void RemoveBlurOverlay()
+        {
+            _blurWindow?.RemoveFromSuperview();
+            _blurWindow?.Dispose();
+            _blurWindow = null;
         }
     }
 }

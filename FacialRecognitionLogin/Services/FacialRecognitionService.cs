@@ -41,7 +41,7 @@ namespace FacialRecognitionLogin
             catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.NotFound))
             {
                 Debug.WriteLine("Person Does Not Exist");
-                DebugHelpers.PrintException(e);
+                DebugService.PrintException(e);
             }
             finally
             {
@@ -129,7 +129,7 @@ namespace FacialRecognitionLogin
             catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.Conflict))
             {
                 Debug.WriteLine("Person Group Already Exists");
-                DebugHelpers.PrintException(e);
+                DebugService.PrintException(e);
             }
         }
 

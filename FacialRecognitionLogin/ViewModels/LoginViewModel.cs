@@ -2,20 +2,35 @@
 using System.Windows.Input;
 using System.Threading.Tasks;
 
+using AsyncAwaitBestPractices;
 using AsyncAwaitBestPractices.MVVM;
 
 namespace FacialRecognitionLogin
 {
     public class LoginViewModel : BaseViewModel
     {
+        #region Constant Fields
+        readonly WeakEventManager _loginApprovedEventManager = new WeakEventManager();
+        readonly WeakEventManager<LoginFailedEventArgs> _loginFailedEventManager = new WeakEventManager<LoginFailedEventArgs>();
+        #endregion
+
         #region Fields
         string _usernameEntryText, _passwordEntryText;
         ICommand _loginButtonTappedCommand;
         #endregion
 
         #region Event
-        public event EventHandler<LoginFailedEventArgs> LoginFailed;
-        public event EventHandler LoginApproved;
+        public event EventHandler LoginApproved
+        {
+            add => _loginApprovedEventManager.AddEventHandler(value);
+            remove => _loginApprovedEventManager.RemoveEventHandler(value);
+        }
+
+        public event EventHandler<LoginFailedEventArgs> LoginFailed
+        {
+            add => _loginFailedEventManager.AddEventHandler(value);
+            remove => _loginFailedEventManager.RemoveEventHandler(value);
+        }
         #endregion
 
         #region Properties
@@ -69,10 +84,10 @@ namespace FacialRecognitionLogin
         }
 
         void OnLoginFailed(string errorMessage, bool shouldDisplaySignUpPrompt) =>
-            LoginFailed?.Invoke(this, new LoginFailedEventArgs(errorMessage, shouldDisplaySignUpPrompt));
+            _loginFailedEventManager?.HandleEvent(this, new LoginFailedEventArgs(errorMessage, shouldDisplaySignUpPrompt), nameof(LoginFailed));
 
         void OnLoginApproved() =>
-            LoginApproved?.Invoke(this, EventArgs.Empty);
+            _loginApprovedEventManager?.HandleEvent(this, EventArgs.Empty, nameof(LoginApproved));
         #endregion
     }
 }
