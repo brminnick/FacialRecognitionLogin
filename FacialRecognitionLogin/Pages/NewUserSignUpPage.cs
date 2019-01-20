@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
 
 namespace FacialRecognitionLogin
 {
@@ -25,7 +26,7 @@ namespace FacialRecognitionLogin
                 ReturnType = ReturnType.Next,
                 ReturnCommand = new Command(() => _passwordEntry.Focus())
             };
-            _usernameEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
+            _usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
 
             _passwordEntry = new StyledEntry(1)
             {
@@ -38,7 +39,7 @@ namespace FacialRecognitionLogin
                 ReturnType = ReturnType.Done,
                 ReturnCommand = new Command(() => _passwordEntry.Unfocus())
             };
-            _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+            _passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
@@ -67,7 +68,11 @@ namespace FacialRecognitionLogin
             _takePhotoButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
             _takePhotoButton.SetBinding(Button.CommandProperty, nameof(ViewModel.TakePhotoButtonCommand));
 
-            var isFacialRecognitionCompletedDescriptionLabel = new StyledLabel { Text = "Facial Recognition Completed" };
+            var isFacialRecognitionCompletedDescriptionLabel = new StyledLabel
+            {
+                Text = "Facial Recognition Completed",
+                VerticalTextAlignment = TextAlignment.Center
+            };
 
             var isFacialRecognitionCompletedLabel = new FontAwesomeIcon
             {
@@ -76,12 +81,9 @@ namespace FacialRecognitionLogin
                 HorizontalTextAlignment = TextAlignment.Center
             };
             isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(ViewModel.FontAwesomeLabelText));
-            switch (Device.RuntimePlatform)
-            {
-                case Device.iOS:
-                    isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
-                    break;
-            }
+
+            if (Device.RuntimePlatform is Device.iOS)
+                isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
 
             var activityIndicator = new ActivityIndicator
             {
@@ -130,6 +132,7 @@ namespace FacialRecognitionLogin
                     facialRecognitionStackLayout,
                 }
             };
+
             switch (Device.RuntimePlatform)
             {
                 case Device.iOS:
@@ -139,12 +142,14 @@ namespace FacialRecognitionLogin
                     stackLayout.Children.Add(activityIndicator);
                     break;
                 default:
-                    throw new Exception("Device Runtime Unsupported");
+                    throw new NotSupportedException("Device Runtime Unsupported");
             }
             stackLayout.Children.Add(_saveUsernameButton);
             stackLayout.Children.Add(_cancelButton);
 
-            Content = new ScrollView { Content = stackLayout };
+            Content = new Xamarin.Forms.ScrollView { Content = stackLayout };
+
+            On<Xamarin.Forms.PlatformConfiguration.iOS>().SetUseSafeArea(true);
         }
         #endregion
 

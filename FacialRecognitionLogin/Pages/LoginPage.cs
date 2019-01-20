@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
 
 namespace FacialRecognitionLogin
 {
@@ -14,10 +16,6 @@ namespace FacialRecognitionLogin
         readonly StyledButton _loginButton, _newUserSignUpButton;
         readonly StyledEntry _usernameEntry, _passwordEntry;
         readonly Label _logoSlogan;
-        #endregion
-
-        #region Fields
-        bool _hasAnimated;
         #endregion
 
         #region Constructors
@@ -39,7 +37,7 @@ namespace FacialRecognitionLogin
                 ReturnType = ReturnType.Next,
                 ReturnCommand = new Command(() => _passwordEntry.Focus())
             };
-            _usernameEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
+            _usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
 
             _passwordEntry = new StyledEntry
             {
@@ -47,8 +45,8 @@ namespace FacialRecognitionLogin
                 IsPassword = true,
                 ReturnType = ReturnType.Done
             };
-            _passwordEntry.SetBinding(Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
-            _passwordEntry.SetBinding(Entry.ReturnCommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
+            _passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+            _passwordEntry.SetBinding(Xamarin.Forms.Entry.ReturnCommandProperty, nameof(ViewModel.LoginButtonTappedCommand));
 
             _loginButton = new StyledButton(Borders.Thin) { Text = "Login" };
             _loginButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
@@ -60,6 +58,8 @@ namespace FacialRecognitionLogin
             var activityIndicator = new ActivityIndicator { Color = Color.White };
             activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
             activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
+
+            On<Xamarin.Forms.PlatformConfiguration.iOS>().SetUseSafeArea(true);
 
             Func<RelativeLayout, double> getNewUserButtonWidth = (p) => _newUserSignUpButton.Measure(p.Width, p.Height).Request.Width;
             Func<RelativeLayout, double> getLogoSloganWidth = (p) => _logoSlogan.Measure(p.Width, p.Height).Request.Width;
@@ -109,7 +109,7 @@ namespace FacialRecognitionLogin
                 xConstraint: Constraint.RelativeToParent(parent => parent.Width / 2 - getActivityIndicatorWidth(parent) / 2),
                 yConstraint: Constraint.RelativeToParent(parent => parent.Height / 2 - getActivityIndicatorHeight(parent) / 2));
 
-            Content = new ScrollView { Content = _relativeLayout };
+            Content = new Xamarin.Forms.ScrollView { Content = _relativeLayout };
         }
         #endregion
 
@@ -118,7 +118,7 @@ namespace FacialRecognitionLogin
         {
             base.OnAppearing();
 
-            if (!_hasAnimated)
+            if (!Navigation.NavigationStack.OfType<SuccessPage>().Any())
             {
                 AnimateLoginPage();
                 Navigation.InsertPageBefore(new SuccessPage(), this);
@@ -160,8 +160,6 @@ namespace FacialRecognitionLogin
                                    _usernameEntry?.FadeTo(1, 250),
                                    _passwordEntry?.FadeTo(1, 250),
                                    _loginButton?.FadeTo(1, 249));
-
-                _hasAnimated = true;
             });
         }
 
