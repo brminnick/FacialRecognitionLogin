@@ -5,7 +5,7 @@ Built using [Xamarin.Forms](https://docs.microsoft.com/xamarin/xamarin-forms/?WT
 
 ## Getting Started - iOS
 
-To launch this app on a physical iOS device, you must create a custom Provisioning Profile that uses an App Groups Entitlement. 
+To launch this app on a physical iOS device, you must create a custom Provisioning Profile that the Keychain Entitlement. 
 
 The Xamarin Developer docs have a walkthough to accomplish this: https://developer.xamarin.com/guides/ios/application_fundamentals/working-with-app-groups/
 
