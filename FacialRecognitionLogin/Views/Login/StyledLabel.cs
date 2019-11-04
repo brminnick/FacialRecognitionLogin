@@ -7,7 +7,7 @@ namespace FacialRecognitionLogin
 		public StyledLabel()
 		{
 			TextColor = Color.White;
-			FontFamily = App.GetDefaultFontFamily();
+			FontFamily = FontConstants.DefaultFontFamily;
 			FontSize = 14;
 		}
 	}

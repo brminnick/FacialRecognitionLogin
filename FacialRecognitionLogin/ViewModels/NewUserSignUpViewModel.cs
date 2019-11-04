@@ -12,19 +12,17 @@ namespace FacialRecognitionLogin
 {
     public class NewUserSignUpViewModel : BaseViewModel
     {
-        #region Constant Fields
         readonly WeakEventManager _saveSuccessfullyCompletedEventManager = new WeakEventManager();
         readonly WeakEventManager<string> _takePhotoFailedEventManager = new WeakEventManager<string>();
         readonly WeakEventManager<string> _saveFailedEventManager = new WeakEventManager<string>();
-        #endregion
 
-        #region Fields
         Guid _facialRecognitionUserGUID;
-        string _usernameEntryText, _passwordEntryText, _fontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
-        ICommand _takePhotoButtonCommand, _saveButtonCommand, _cancelButtonCommand;
-        #endregion
+        ICommand? _takePhotoButtonCommand, _saveButtonCommand, _cancelButtonCommand, _deleteGuidCommand;
 
-        #region Events
+        string _usernameEntryText = string.Empty,
+            _passwordEntryText = string.Empty,
+            _fontAwesomeLabelText = FontAwesomeIcon.EmptyBox.ToString();
+
         public event EventHandler SaveSuccessfullyCompleted
         {
             add => _saveSuccessfullyCompletedEventManager.AddEventHandler(value);
@@ -42,17 +40,11 @@ namespace FacialRecognitionLogin
             add => _saveFailedEventManager.AddEventHandler(value);
             remove => _saveFailedEventManager.RemoveEventHandler(value);
         }
-        #endregion
 
-        #region Properties
-        public ICommand CancelButtonCommand => _cancelButtonCommand ??
-            (_cancelButtonCommand = new AsyncCommand(ExecuteCancelButtonCommand, continueOnCapturedContext: false));
-
-        public ICommand TakePhotoButtonCommand => _takePhotoButtonCommand ??
-            (_takePhotoButtonCommand = new AsyncCommand(() => ExecuteTakePhotoButtonCommand(UsernameEntryText), continueOnCapturedContext: false));
-
-        public ICommand SaveButtonCommand => _saveButtonCommand ??
-            (_saveButtonCommand = new AsyncCommand(() => ExecuteSaveButtonCommand(UsernameEntryText, PasswordEntryText), continueOnCapturedContext: false));
+        public ICommand CancelButtonCommand => _cancelButtonCommand ??= new AsyncCommand(ExecuteCancelButtonCommand);
+        public ICommand TakePhotoButtonCommand => _takePhotoButtonCommand ??= new AsyncCommand(() => ExecuteTakePhotoButtonCommand(UsernameEntryText, PasswordEntryText));
+        public ICommand SaveButtonCommand => _saveButtonCommand ??= new AsyncCommand(() => ExecuteSaveButtonCommand(UsernameEntryText, PasswordEntryText));
+        public ICommand DeleteGuidCommand => _deleteGuidCommand ??= new AsyncCommand(ExecuteDeleteGuidCommand);
 
         public string UsernameEntryText
         {
@@ -72,25 +64,21 @@ namespace FacialRecognitionLogin
             set => SetProperty(ref _fontAwesomeLabelText, value);
         }
 
-        bool IsUsernamePasswordValid => string.IsNullOrWhiteSpace(UsernameEntryText) || string.IsNullOrWhiteSpace(PasswordEntryText);
-        #endregion
-
-        #region Methods
-        async Task ExecuteTakePhotoButtonCommand(string username)
+        async Task ExecuteTakePhotoButtonCommand(string username, string password)
         {
-            if (IsUsernamePasswordValid)
+            if (IsUsernamePasswordValid(username, password))
             {
                 OnTakePhotoFailed("Username / Password Empty");
                 return;
             }
 
-            var photoStream = await PhotoService.GetPhotoStreamFromCamera().ConfigureAwait(false);
-            if (photoStream is null)
+            var mediaFile = await PhotoService.GetMediaFileFromCamera().ConfigureAwait(false);
+            if (mediaFile is null)
                 return;
 
             try
             {
-                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, photoStream).ConfigureAwait(false);
+                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, mediaFile.GetStream()).ConfigureAwait(false);
                 FontAwesomeLabelText = FontAwesomeIcon.CheckedBox.ToString();
             }
             catch (Exception e)
@@ -106,7 +94,7 @@ namespace FacialRecognitionLogin
             {
                 OnSaveFailed("Photo Required for Facial Recognition");
             }
-            else if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            else if (IsUsernamePasswordValid(username, password))
             {
                 OnSaveFailed("Username / Password Empty");
             }
@@ -130,8 +118,6 @@ namespace FacialRecognitionLogin
         {
             await WaitForNewUserSignUpPageToDisappear().ConfigureAwait(false);
 
-            if (!_facialRecognitionUserGUID.Equals(default(Guid)))
-                await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID).ConfigureAwait(false);
         }
 
         async Task WaitForNewUserSignUpPageToDisappear()
@@ -142,6 +128,12 @@ namespace FacialRecognitionLogin
             }
         }
 
+        Task ExecuteDeleteGuidCommand() => _facialRecognitionUserGUID != default
+                                ? FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID)
+                                : Task.CompletedTask;
+
+        bool IsUsernamePasswordValid(string username, string password) => string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password);
+
         void OnTakePhotoFailed(string errorMessage) =>
             _takePhotoFailedEventManager?.HandleEvent(this, errorMessage, nameof(TakePhotoFailed));
 
@@ -150,6 +142,5 @@ namespace FacialRecognitionLogin
 
         void OnSaveSuccessfullyCompleted() =>
             _saveSuccessfullyCompletedEventManager?.HandleEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
-        #endregion
     }
 }

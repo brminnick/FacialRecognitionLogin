@@ -5,23 +5,18 @@ using System.Threading.Tasks;
 using AsyncAwaitBestPractices;
 using AsyncAwaitBestPractices.MVVM;
 
-using Xamarin.Essentials;
-
 namespace FacialRecognitionLogin
 {
     public class LoginViewModel : BaseViewModel
     {
-        #region Constant Fields
         readonly WeakEventManager _loginApprovedEventManager = new WeakEventManager();
         readonly WeakEventManager<LoginFailedEventArgs> _loginFailedEventManager = new WeakEventManager<LoginFailedEventArgs>();
-        #endregion
 
-        #region Fields
-        string _usernameEntryText, _passwordEntryText;
-        ICommand _loginButtonTappedCommand;
-        #endregion
+        ICommand? _loginButtonTappedCommand;
 
-        #region Event
+        string _usernameEntryText = string.Empty,
+            _passwordEntryText = string.Empty;
+
         public event EventHandler LoginApproved
         {
             add => _loginApprovedEventManager.AddEventHandler(value);
@@ -33,11 +28,8 @@ namespace FacialRecognitionLogin
             add => _loginFailedEventManager.AddEventHandler(value);
             remove => _loginFailedEventManager.RemoveEventHandler(value);
         }
-        #endregion
 
-        #region Properties
-        public ICommand LoginButtonTappedCommand => _loginButtonTappedCommand ??
-            (_loginButtonTappedCommand = new AsyncCommand(() => ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText), continueOnCapturedContext: false));
+        public ICommand LoginButtonTappedCommand => _loginButtonTappedCommand ??= new AsyncCommand(() => ExecuteLoginButtonTappedCommand(UsernameEntryText, PasswordEntryText));
 
         public string UsernameEntryText
         {
@@ -50,9 +42,7 @@ namespace FacialRecognitionLogin
             get => _passwordEntryText;
             set => SetProperty(ref _passwordEntryText, value);
         }
-        #endregion
 
-        #region Methods
         async Task ExecuteLoginButtonTappedCommand(string usernameEntryText, string passwordEntryText)
         {
             if (string.IsNullOrWhiteSpace(usernameEntryText) || string.IsNullOrWhiteSpace(passwordEntryText))
@@ -65,15 +55,15 @@ namespace FacialRecognitionLogin
 
             if (isLoginValid)
             {
-                var photoStream = await PhotoService.GetPhotoStreamFromCamera().ConfigureAwait(false);
+                var mediaFile = await PhotoService.GetMediaFileFromCamera().ConfigureAwait(false);
 
-                if (photoStream is null)
+                if (mediaFile is null)
                 {
                     OnLoginFailed("Facial Recognition Required", false);
                 }
                 else
                 {
-                    var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, photoStream).ConfigureAwait(false);
+                    var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, mediaFile.GetStream()).ConfigureAwait(false);
 
                     if (isFaceRecognized)
                         OnLoginApproved();
@@ -92,6 +82,5 @@ namespace FacialRecognitionLogin
 
         void OnLoginApproved() =>
             _loginApprovedEventManager?.HandleEvent(this, EventArgs.Empty, nameof(LoginApproved));
-        #endregion
     }
 }

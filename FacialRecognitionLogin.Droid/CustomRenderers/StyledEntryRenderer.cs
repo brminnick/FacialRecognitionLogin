@@ -21,10 +21,10 @@ namespace FacialRecognitionLogin.Droid
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement != null)
+            if (e.NewElement != null && Control != null)
             {
                 Control.SetHintTextColor(Xamarin.Forms.Color.White.ToAndroid());
-                Control.Typeface = Typeface.Create(App.GetDefaultFontFamily(), TypefaceStyle.Normal);
+                Control.Typeface = Typeface.Create(FontConstants.DefaultFontFamily, TypefaceStyle.Normal);
             }
         }
     }

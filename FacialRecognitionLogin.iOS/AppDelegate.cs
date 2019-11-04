@@ -4,9 +4,9 @@ using Foundation;
 namespace FacialRecognitionLogin.iOS
 {
     [Register(nameof(AppDelegate))]
-    public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+    public class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
-        UIVisualEffectView _blurWindow;
+        UIVisualEffectView? _blurWindow;
 
         public override bool FinishedLaunching(UIApplication uiApplication, NSDictionary launchOptions)
         {
@@ -33,13 +33,11 @@ namespace FacialRecognitionLogin.iOS
 
         void AddBlurOverlay()
         {
-            using (var blurEffect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light))
+            using var blurEffect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light);
+            _blurWindow = new UIVisualEffectView(blurEffect)
             {
-                _blurWindow = new UIVisualEffectView(blurEffect)
-                {
-                    Frame = UIApplication.SharedApplication.KeyWindow.RootViewController.View.Bounds
-                };
-            }
+                Frame = UIApplication.SharedApplication.KeyWindow.RootViewController.View.Bounds
+            };
 
             UIApplication.SharedApplication.KeyWindow.RootViewController.View.AddSubview(_blurWindow);
         }

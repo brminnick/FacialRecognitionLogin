@@ -7,11 +7,8 @@ namespace FacialRecognitionLogin
 {
     public class NewUserSignUpPage : BaseMediaContentPage<NewUserSignUpViewModel>
     {
-        #region Constant Fields
         readonly StyledButton _saveUsernameButton, _cancelButton, _takePhotoButton;
-        #endregion
 
-        #region Constructos
         public NewUserSignUpPage()
         {
             ViewModel.SaveFailed += HandleSaveFailed;
@@ -31,7 +28,7 @@ namespace FacialRecognitionLogin
                 ReturnType = ReturnType.Done
             };
             passwordEntry.ReturnCommand = new Command(() => passwordEntry.Unfocus());
-            passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.PasswordEntryText));
+            passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(NewUserSignUpViewModel.PasswordEntryText));
 
             var usernameEntry = new StyledEntry(1)
             {
@@ -42,7 +39,7 @@ namespace FacialRecognitionLogin
                 ReturnType = ReturnType.Next,
                 ReturnCommand = new Command(() => passwordEntry.Focus())
             };
-            usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(ViewModel.UsernameEntryText));
+            usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(NewUserSignUpViewModel.UsernameEntryText));
 
             _saveUsernameButton = new StyledButton(Borders.Thin, 1)
             {
@@ -50,8 +47,8 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
-            _saveUsernameButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
-            _saveUsernameButton.SetBinding(Button.CommandProperty, nameof(ViewModel.SaveButtonCommand));
+            _saveUsernameButton.SetBinding(IsEnabledProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionInactive));
+            _saveUsernameButton.SetBinding(Button.CommandProperty, nameof(NewUserSignUpViewModel.SaveButtonCommand));
 
             _cancelButton = new StyledButton(Borders.Thin, 1)
             {
@@ -60,8 +57,8 @@ namespace FacialRecognitionLogin
                 VerticalOptions = LayoutOptions.End
             };
             _cancelButton.Clicked += HandleCancelButtonClicked;
-            _cancelButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
-            _cancelButton.SetBinding(Button.CommandProperty, nameof(ViewModel.CancelButtonCommand));
+            _cancelButton.SetBinding(IsEnabledProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionInactive));
+            _cancelButton.SetBinding(Button.CommandProperty, nameof(NewUserSignUpViewModel.CancelButtonCommand));
 
             _takePhotoButton = new StyledButton(Borders.Thin, 1)
             {
@@ -69,8 +66,8 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand
             };
-            _takePhotoButton.SetBinding(IsEnabledProperty, nameof(ViewModel.IsInternetConnectionInactive));
-            _takePhotoButton.SetBinding(Button.CommandProperty, nameof(ViewModel.TakePhotoButtonCommand));
+            _takePhotoButton.SetBinding(IsEnabledProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionInactive));
+            _takePhotoButton.SetBinding(Button.CommandProperty, nameof(NewUserSignUpViewModel.TakePhotoButtonCommand));
 
             var isFacialRecognitionCompletedDescriptionLabel = new StyledLabel
             {
@@ -84,10 +81,10 @@ namespace FacialRecognitionLogin
                 VerticalTextAlignment = TextAlignment.Center,
                 HorizontalTextAlignment = TextAlignment.Center
             };
-            isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(ViewModel.FontAwesomeLabelText));
+            isFacialRecognitionCompletedLabel.SetBinding(Label.TextProperty, nameof(NewUserSignUpViewModel.FontAwesomeLabelText));
 
             if (Device.RuntimePlatform is Device.iOS)
-                isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionInactive));
+                isFacialRecognitionCompletedLabel.SetBinding(IsVisibleProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionInactive));
 
             var activityIndicator = new ActivityIndicator
             {
@@ -95,8 +92,8 @@ namespace FacialRecognitionLogin
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.EndAndExpand,
             };
-            activityIndicator.SetBinding(IsVisibleProperty, nameof(ViewModel.IsInternetConnectionActive));
-            activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(ViewModel.IsInternetConnectionActive));
+            activityIndicator.SetBinding(IsVisibleProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionActive));
+            activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionActive));
 
             var facialRecognitionStackLayout = new StackLayout
             {
@@ -155,9 +152,14 @@ namespace FacialRecognitionLogin
 
             On<Xamarin.Forms.PlatformConfiguration.iOS>().SetUseSafeArea(true);
         }
-        #endregion
 
-        #region Methods
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            ViewModel.DeleteGuidCommand.Execute(null);
+        }
+
         protected override void LayoutChildren(double x, double y, double width, double height)
         {
             _cancelButton.WidthRequest = width - 40;
@@ -184,6 +186,5 @@ namespace FacialRecognitionLogin
 
         void HandleTakePhotoFailed(object sender, string errorMessage) =>
             Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
-        #endregion
     }
 }

@@ -14,22 +14,15 @@ namespace FacialRecognitionLogin
 {
     public static class FacialRecognitionService
     {
-        #region Constant Fields
         const string _personGroupId = "persongroupid";
         const string _personGroupName = "Facial Recognition Login Group";
         readonly static Lazy<FaceClient> _faceApiClientHolder = new Lazy<FaceClient>(() =>
              new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { Endpoint = AzureConstants.FaceApiBaseUrl });
-        #endregion
 
-        #region Fields
-        static int _networkIndicatorCount = 0;
-        #endregion
+        static int _networkIndicatorCount;
 
-        #region Properties
         static FaceClient FaceApiClient => _faceApiClientHolder.Value;
-        #endregion
 
-        #region Methods
         public static async Task RemoveExistingFace(Guid userId)
         {
             UpdateActivityIndicatorStatus(true);
@@ -150,15 +143,11 @@ namespace FacialRecognitionLogin
 
         static BaseViewModel GetCurrentViewModel()
         {
-            Page currentPage;
+            var currentPage = Application.Current.MainPage.Navigation.ModalStack.Any()
+                                ? Application.Current.MainPage.Navigation.ModalStack.LastOrDefault()
+                                : Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
 
-            if (Application.Current.MainPage.Navigation.ModalStack.Any())
-                currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault();
-            else
-                currentPage = Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
-
-            return currentPage.BindingContext as BaseViewModel;
+            return (BaseViewModel)currentPage.BindingContext;
         }
-        #endregion
     }
 }

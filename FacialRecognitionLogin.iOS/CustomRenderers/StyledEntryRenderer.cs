@@ -14,11 +14,8 @@ namespace FacialRecognitionLogin.iOS
 {
     public class StyledEntryRenderer : EntryRenderer
     {
-        #region Constant Fields
         const int _defaultFontSize = 18;
-        #endregion
 
-        #region Methods
         protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
@@ -36,17 +33,16 @@ namespace FacialRecognitionLogin.iOS
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement != null && !Control.Font.FamilyName.Equals(App.GetDefaultFontFamily()))
+            if (e.NewElement != null && !Control.Font.FamilyName.Equals(FontConstants.DefaultFontFamily))
             {
-                var formsEntry = e.NewElement as StyledEntry;
+                var newEntry = e.NewElement;
 
-                Control.Font = UIFont.FromName(App.GetDefaultFontFamily(), _defaultFontSize);
+                Control.Font = UIFont.FromName(FontConstants.DefaultFontFamily, _defaultFontSize);
                 Control.TextColor = UIColor.White;
 
-                if (!string.IsNullOrEmpty(formsEntry.Placeholder))
-                    Control.AttributedPlaceholder = new NSAttributedString(formsEntry.Placeholder, UIFont.FromName(App.GetDefaultFontFamily(), _defaultFontSize), UIColor.White);
+                if (!string.IsNullOrEmpty(newEntry.Placeholder))
+                    Control.AttributedPlaceholder = new NSAttributedString(newEntry.Placeholder, UIFont.FromName(FontConstants.DefaultFontFamily, _defaultFontSize), UIColor.White);
             }
         }
-        #endregion
     }
 }

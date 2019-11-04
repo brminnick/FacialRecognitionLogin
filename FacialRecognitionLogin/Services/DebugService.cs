@@ -6,7 +6,6 @@ namespace FacialRecognitionLogin
 {
 	public static class DebugService
 	{
-		#region Methods
 		[Conditional("DEBUG")]
 		public static void PrintException(
 			Exception exception,
@@ -22,6 +21,5 @@ namespace FacialRecognitionLogin
 			Debug.WriteLine($"Caller Name: {callerMemberName}");
 			Debug.WriteLine($"File Name: {fileName}");
 		}
-		#endregion
 	}
 }

@@ -15,12 +15,9 @@ namespace FacialRecognitionLogin
 {
     public static class PhotoService
     {
-        #region Constant Fields
         readonly static WeakEventManager _noCameraDetectedEventManager = new WeakEventManager();
         readonly static WeakEventManager _permissionsDeniedEventManager = new WeakEventManager();
-        #endregion
 
-        #region Events
         public static event EventHandler NoCameraDetected
         {
             add => _noCameraDetectedEventManager.AddEventHandler(value);
@@ -31,10 +28,8 @@ namespace FacialRecognitionLogin
             add => _permissionsDeniedEventManager.AddEventHandler(value);
             remove => _permissionsDeniedEventManager.RemoveEventHandler(value);
         }
-        #endregion
 
-        #region Methods
-        public static async Task<Stream> GetPhotoStreamFromCamera()
+        public static async Task<MediaFile?> GetMediaFileFromCamera()
         {
             await CrossMedia.Current.Initialize().ConfigureAwait(false);
 
@@ -51,35 +46,14 @@ namespace FacialRecognitionLogin
                 return null;
             }
 
-            var mediaFileTCS = new TaskCompletionSource<MediaFile>();
-
-            Device.BeginInvokeOnMainThread(async () =>
+            return await Device.InvokeOnMainThreadAsync(() =>
             {
-                var mediaFile = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
+                return CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
                 {
                     PhotoSize = PhotoSize.Small,
                     DefaultCamera = CameraDevice.Front,
-                }).ConfigureAwait(false);
-
-                mediaFileTCS.SetResult(mediaFile);
-            });
-
-            var file = await mediaFileTCS.Task.ConfigureAwait(false);
-
-            if (file is null)
-                return null;
-
-            return GetPhotoStream(file, false);
-        }
-
-        static Stream GetPhotoStream(MediaFile mediaFile, bool disposeMediaFile)
-        {
-            var stream = mediaFile.GetStream();
-
-            if (disposeMediaFile)
-                mediaFile.Dispose();
-
-            return stream;
+                });
+            }).ConfigureAwait(false);
         }
 
         static async Task<bool> ArePermissionsGranted()
@@ -94,17 +68,11 @@ namespace FacialRecognitionLogin
                 storageStatus = results[Permission.Storage];
             }
 
-            if (cameraStatus is PermissionStatus.Granted
-                    && storageStatus is PermissionStatus.Granted)
-            {
-                return true;
-            }
-
-            return false;
+            return cameraStatus is PermissionStatus.Granted
+                    && storageStatus is PermissionStatus.Granted;
         }
 
         static void OnNoCameraDetected() => _noCameraDetectedEventManager.HandleEvent(null, EventArgs.Empty, nameof(NoCameraDetected));
         static void OnPermissionsDenied() => _permissionsDeniedEventManager.HandleEvent(null, EventArgs.Empty, nameof(PermissionsDenied));
-        #endregion
     }
 }
