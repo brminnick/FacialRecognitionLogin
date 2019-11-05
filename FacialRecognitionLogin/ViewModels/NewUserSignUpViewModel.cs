@@ -6,8 +6,6 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices;
 using AsyncAwaitBestPractices.MVVM;
 
-using Xamarin.Forms;
-
 namespace FacialRecognitionLogin
 {
     public class NewUserSignUpViewModel : BaseViewModel
@@ -17,7 +15,7 @@ namespace FacialRecognitionLogin
         readonly WeakEventManager<string> _saveFailedEventManager = new WeakEventManager<string>();
 
         Guid _facialRecognitionUserGUID;
-        ICommand? _takePhotoButtonCommand, _saveButtonCommand, _cancelButtonCommand, _deleteGuidCommand;
+        ICommand? _takePhotoButtonCommand, _saveButtonCommand, _deleteGuidCommand;
 
         string _usernameEntryText = string.Empty,
             _passwordEntryText = string.Empty,
@@ -41,10 +39,9 @@ namespace FacialRecognitionLogin
             remove => _saveFailedEventManager.RemoveEventHandler(value);
         }
 
-        public ICommand CancelButtonCommand => _cancelButtonCommand ??= new AsyncCommand(ExecuteCancelButtonCommand);
         public ICommand TakePhotoButtonCommand => _takePhotoButtonCommand ??= new AsyncCommand(() => ExecuteTakePhotoButtonCommand(UsernameEntryText, PasswordEntryText));
         public ICommand SaveButtonCommand => _saveButtonCommand ??= new AsyncCommand(() => ExecuteSaveButtonCommand(UsernameEntryText, PasswordEntryText));
-        public ICommand DeleteGuidCommand => _deleteGuidCommand ??= new AsyncCommand(ExecuteDeleteGuidCommand);
+        public ICommand DeleteGuidCommand => _deleteGuidCommand ??= new AsyncValueCommand(ExecuteDeleteGuidCommand);
 
         public string UsernameEntryText
         {
@@ -114,23 +111,11 @@ namespace FacialRecognitionLogin
             }
         }
 
-        async Task ExecuteCancelButtonCommand()
+        async ValueTask ExecuteDeleteGuidCommand()
         {
-            await WaitForNewUserSignUpPageToDisappear().ConfigureAwait(false);
-
+            if (_facialRecognitionUserGUID != default)
+                await FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID);
         }
-
-        async Task WaitForNewUserSignUpPageToDisappear()
-        {
-            while (Application.Current.MainPage.Navigation.ModalStack.OfType<NewUserSignUpPage>().Any())
-            {
-                await Task.Delay(1000).ConfigureAwait(false);
-            }
-        }
-
-        Task ExecuteDeleteGuidCommand() => _facialRecognitionUserGUID != default
-                                ? FacialRecognitionService.RemoveExistingFace(_facialRecognitionUserGUID)
-                                : Task.CompletedTask;
 
         bool IsUsernamePasswordValid(string username, string password) => string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password);
 

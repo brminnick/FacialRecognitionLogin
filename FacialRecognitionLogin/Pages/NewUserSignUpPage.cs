@@ -58,7 +58,6 @@ namespace FacialRecognitionLogin
             };
             _cancelButton.Clicked += HandleCancelButtonClicked;
             _cancelButton.SetBinding(IsEnabledProperty, nameof(NewUserSignUpViewModel.IsInternetConnectionInactive));
-            _cancelButton.SetBinding(Button.CommandProperty, nameof(NewUserSignUpViewModel.CancelButtonCommand));
 
             _takePhotoButton = new StyledButton(Borders.Thin, 1)
             {
