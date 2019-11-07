@@ -1,11 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 
 namespace FacialRecognitionLogin
 {
     public class App : Application
     {
-        //Use a blank ContentPage as a placeholder until OnStart calls InitializeMainPage
         public App()
         {
             var loginPage = new LoginPage();

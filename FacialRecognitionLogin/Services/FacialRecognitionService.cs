@@ -55,7 +55,7 @@ namespace FacialRecognitionLogin
                 var faceResult = await FaceApiClient.PersonGroupPerson.AddFaceFromStreamAsync(_personGroupId, createPersonResult.PersonId, photo).ConfigureAwait(false);
 
                 var trainingStatus = await TrainPersonGroup(_personGroupId).ConfigureAwait(false);
-                if (trainingStatus.Status.Equals(TrainingStatusType.Failed))
+                if (trainingStatus.Status is TrainingStatusType.Failed)
                     throw new Exception(trainingStatus.Message);
 
                 return faceResult.PersistedFaceId;
@@ -119,7 +119,7 @@ namespace FacialRecognitionLogin
             {
                 await FaceApiClient.PersonGroup.CreateAsync(_personGroupId, _personGroupName).ConfigureAwait(false);
             }
-            catch (APIErrorException e) when (e.Response.StatusCode.Equals(HttpStatusCode.Conflict))
+            catch (APIErrorException e) when (e.Response.StatusCode is HttpStatusCode.Conflict)
             {
                 Debug.WriteLine("Person Group Already Exists");
                 DebugService.PrintException(e);

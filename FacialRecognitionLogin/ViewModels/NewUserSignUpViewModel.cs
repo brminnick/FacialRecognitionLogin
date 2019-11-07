@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -120,12 +119,12 @@ namespace FacialRecognitionLogin
         bool IsUsernamePasswordValid(string username, string password) => string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password);
 
         void OnTakePhotoFailed(string errorMessage) =>
-            _takePhotoFailedEventManager?.HandleEvent(this, errorMessage, nameof(TakePhotoFailed));
+            _takePhotoFailedEventManager.HandleEvent(this, errorMessage, nameof(TakePhotoFailed));
 
         void OnSaveFailed(string errorMessage) =>
-            _saveFailedEventManager?.HandleEvent(this, errorMessage, nameof(SaveFailed));
+            _saveFailedEventManager.HandleEvent(this, errorMessage, nameof(SaveFailed));
 
         void OnSaveSuccessfullyCompleted() =>
-            _saveSuccessfullyCompletedEventManager?.HandleEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
+            _saveSuccessfullyCompletedEventManager.HandleEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
     }
 }
