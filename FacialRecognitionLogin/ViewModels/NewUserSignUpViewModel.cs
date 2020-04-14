@@ -68,7 +68,7 @@ namespace FacialRecognitionLogin
                 return;
             }
 
-            var mediaFile = await PhotoService.GetMediaFileFromCamera().ConfigureAwait(false);
+            var mediaFile = await MediaService.GetMediaFileFromCamera().ConfigureAwait(false);
             if (mediaFile is null)
                 return;
 

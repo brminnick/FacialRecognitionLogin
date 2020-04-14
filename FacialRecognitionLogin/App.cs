@@ -6,6 +6,8 @@ namespace FacialRecognitionLogin
     {
         public App()
         {
+            Device.SetFlags(new[] { "Markup_Experimental" });
+
             var loginPage = new LoginPage();
 
             MainPage = new NavigationPage(loginPage)

@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace FacialRecognitionLogin
@@ -17,7 +18,7 @@ namespace FacialRecognitionLogin
         const string _personGroupId = "persongroupid";
         const string _personGroupName = "Facial Recognition Login Group";
         readonly static Lazy<FaceClient> _faceApiClientHolder = new Lazy<FaceClient>(() =>
-             new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey)) { Endpoint = AzureConstants.FaceApiBaseUrl });
+             new FaceClient(new ApiKeyServiceClientCredentials(AzureConstants.FacialRecognitionAPIKey), new HttpClient(), false) { Endpoint = AzureConstants.FaceApiBaseUrl });
 
         static int _networkIndicatorCount;
 
@@ -25,7 +26,7 @@ namespace FacialRecognitionLogin
 
         public static async Task RemoveExistingFace(Guid userId)
         {
-            UpdateActivityIndicatorStatus(true);
+            await UpdateActivityIndicatorStatus(true).ConfigureAwait(false);
 
             try
             {
@@ -38,13 +39,13 @@ namespace FacialRecognitionLogin
             }
             finally
             {
-                UpdateActivityIndicatorStatus(false);
+                await UpdateActivityIndicatorStatus(false).ConfigureAwait(false);
             }
         }
 
         public static async Task<Guid> AddNewFace(string username, Stream photo)
         {
-            UpdateActivityIndicatorStatus(true);
+            await UpdateActivityIndicatorStatus(true).ConfigureAwait(false);
 
             try
             {
@@ -62,13 +63,13 @@ namespace FacialRecognitionLogin
             }
             finally
             {
-                UpdateActivityIndicatorStatus(false);
+                await UpdateActivityIndicatorStatus(false).ConfigureAwait(false);
             }
         }
 
         public static async Task<bool> IsFaceIdentified(string username, Stream photo)
         {
-            UpdateActivityIndicatorStatus(true);
+            await UpdateActivityIndicatorStatus(true).ConfigureAwait(false);
 
             try
             {
@@ -93,22 +94,20 @@ namespace FacialRecognitionLogin
             }
             finally
             {
-                UpdateActivityIndicatorStatus(false);
+                await UpdateActivityIndicatorStatus(false).ConfigureAwait(false);
             }
         }
 
-        static void UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
+        static async Task UpdateActivityIndicatorStatus(bool isActivityIndicatorDisplayed)
         {
-            var viewModel = GetCurrentViewModel();
-
             if (isActivityIndicatorDisplayed)
             {
-                viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = true;
+                await MainThread.InvokeOnMainThreadAsync(() => GetBaseViewModel().IsInternetConnectionActive = Application.Current.MainPage.IsBusy = true);
                 _networkIndicatorCount++;
             }
             else if (--_networkIndicatorCount <= 0)
             {
-                viewModel.IsInternetConnectionActive = Application.Current.MainPage.IsBusy = false;
+                await MainThread.InvokeOnMainThreadAsync(() => GetBaseViewModel().IsInternetConnectionActive = Application.Current.MainPage.IsBusy = false);
                 _networkIndicatorCount = 0;
             }
         }
@@ -136,16 +135,18 @@ namespace FacialRecognitionLogin
             {
                 trainingStatus = await FaceApiClient.PersonGroup.GetTrainingStatusAsync(_personGroupId).ConfigureAwait(false);
             }
-            while (!(trainingStatus.Status is TrainingStatusType.Failed || trainingStatus.Status is TrainingStatusType.Succeeded));
+            while (!hasTrainingStatusCompleted(trainingStatus));
 
             return trainingStatus;
+
+            static bool hasTrainingStatusCompleted(in TrainingStatus trainingStatus) =>
+                trainingStatus.Status != TrainingStatusType.Failed && trainingStatus.Status != TrainingStatusType.Succeeded;
         }
 
-        static BaseViewModel GetCurrentViewModel()
+        static BaseViewModel GetBaseViewModel()
         {
-            var currentPage = Application.Current.MainPage.Navigation.ModalStack.Any()
-                                ? Application.Current.MainPage.Navigation.ModalStack.LastOrDefault()
-                                : Application.Current.MainPage.Navigation.NavigationStack.LastOrDefault();
+            var currentPage = Application.Current.MainPage.Navigation.ModalStack.LastOrDefault()
+                                ?? Application.Current.MainPage.Navigation.NavigationStack.Last();
 
             return (BaseViewModel)currentPage.BindingContext;
         }

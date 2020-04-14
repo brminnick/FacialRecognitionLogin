@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
 
@@ -67,41 +67,39 @@ namespace FacialRecognitionLogin
             _relativeLayout.Children.Add(_logo,
                 Constraint.Constant(100),
                 Constraint.Constant(250),
-                Constraint.RelativeToParent(p => p.Width - 200));
+                Constraint.RelativeToParent(parent => parent.Width - 200));
 
             _relativeLayout.Children.Add(_logoSlogan,
-                Constraint.RelativeToParent(p => (p.Width / 2) - (getLogoSloganWidth(p) / 2)),
+                Constraint.RelativeToParent(parent => parent.Width / 2 - getWidth(parent, _logoSlogan) / 2),
                 Constraint.Constant(125));
 
             _relativeLayout.Children.Add(_usernameEntry,
                 Constraint.Constant(40),
-                Constraint.RelativeToView(_logoSlogan, (p, v) => v.Y + v.Height + _relativeLayoutPadding),
-                Constraint.RelativeToParent(p => p.Width - 80));
+                Constraint.RelativeToView(_logoSlogan, (parent, view) => view.Y + view.Height + _relativeLayoutPadding),
+                Constraint.RelativeToParent(parent => parent.Width - 80));
 
             _relativeLayout.Children.Add(_passwordEntry,
                 Constraint.Constant(40),
-                Constraint.RelativeToView(_usernameEntry, (p, v) => v.Y + v.Height + _relativeLayoutPadding),
-                Constraint.RelativeToParent(p => p.Width - 80));
+                Constraint.RelativeToView(_usernameEntry, (parent, view) => view.Y + view.Height + _relativeLayoutPadding),
+                Constraint.RelativeToParent(parent => parent.Width - 80));
 
             _relativeLayout.Children.Add(_loginButton,
                 Constraint.Constant(40),
-                Constraint.RelativeToView(_passwordEntry, (p, v) => v.Y + v.Height + _relativeLayoutPadding),
-                Constraint.RelativeToParent(p => p.Width - 80));
+                Constraint.RelativeToView(_passwordEntry, (parent, view) => view.Y + view.Height + _relativeLayoutPadding),
+                Constraint.RelativeToParent(parent => parent.Width - 80));
 
             _relativeLayout.Children.Add(_newUserSignUpButton,
-                Constraint.RelativeToParent(p => (p.Width / 2) - (getNewUserButtonWidth(p) / 2)),
-                Constraint.RelativeToView(_loginButton, (parent, view) => view.Y + _loginButton.Height + 15));
+                Constraint.RelativeToParent(parent => parent.Width / 2 - getWidth(parent, _newUserSignUpButton) / 2),
+                Constraint.RelativeToView(_loginButton, (parent, view) => view.Y + getHeight(parent, _loginButton) + 15));
 
             _relativeLayout.Children.Add(activityIndicator,
-                Constraint.RelativeToParent(parent => parent.Width / 2 - getActivityIndicatorWidth(parent) / 2),
-                Constraint.RelativeToParent(parent => parent.Height / 2 - getActivityIndicatorHeight(parent) / 2));
+                Constraint.RelativeToParent(parent => parent.Width / 2 - getWidth(parent, activityIndicator) / 2),
+                Constraint.RelativeToParent(parent => parent.Height / 2 - getHeight(parent, activityIndicator) / 2));
 
             Content = new Xamarin.Forms.ScrollView { Content = _relativeLayout };
 
-            double getNewUserButtonWidth(RelativeLayout parent) => _newUserSignUpButton.Measure(parent.Width, parent.Height).Request.Width;
-            double getLogoSloganWidth(RelativeLayout parent) => _logoSlogan.Measure(parent.Width, parent.Height).Request.Width;
-            double getActivityIndicatorHeight(RelativeLayout parent) => activityIndicator.Measure(parent.Width, parent.Height).Request.Height;
-            double getActivityIndicatorWidth(RelativeLayout parent) => activityIndicator.Measure(parent.Width, parent.Height).Request.Width;
+            static double getWidth(RelativeLayout parent, View view) => view.Measure(parent.Width, parent.Height).Request.Width;
+            static double getHeight(RelativeLayout parent, View view) => view.Measure(parent.Width, parent.Height).Request.Height;
         }
 
         protected override async void OnAppearing()
@@ -117,7 +115,7 @@ namespace FacialRecognitionLogin
 
         Task AnimateLoginPage()
         {
-            return Device.InvokeOnMainThreadAsync(async () =>
+            return MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 await Task.Delay(500);
                 await _logo.TranslateTo(0, -_relativeLayout.Height * 0.3 - 10, 250);
@@ -129,9 +127,9 @@ namespace FacialRecognitionLogin
 
                 await Task.WhenAll(_logoSlogan.FadeTo(1, 5),
                                     _newUserSignUpButton.FadeTo(1, 250),
-                                   _usernameEntry.FadeTo(1, 250),
-                                   _passwordEntry.FadeTo(1, 250),
-                                   _loginButton.FadeTo(1, 249));
+                                    _usernameEntry.FadeTo(1, 250),
+                                    _passwordEntry.FadeTo(1, 250),
+                                    _loginButton.FadeTo(1, 249));
             });
         }
 
@@ -144,11 +142,12 @@ namespace FacialRecognitionLogin
 
         void HandleLoginFailed(object sender, LoginFailedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 if (e.ShouldDisplaySignUpPrompt)
                 {
-                    if (await DisplayAlert("Error", e.ErrorMessage, "Sign Up", "Cancel"))
+                    var shouldOpenSignupPage = await DisplayAlert("Error", e.ErrorMessage, "Sign Up", "Cancel");
+                    if (shouldOpenSignupPage)
                         await OpenNewUserSignUpPage();
                 }
                 else
@@ -158,14 +157,14 @@ namespace FacialRecognitionLogin
             });
         }
 
-        Task OpenNewUserSignUpPage() => Device.InvokeOnMainThreadAsync(() => Navigation.PushModalAsync(new NewUserSignUpPage()));
+        Task OpenNewUserSignUpPage() => MainThread.InvokeOnMainThreadAsync(() => Navigation.PushModalAsync(new NewUserSignUpPage()));
 
         async void HandleNewUserSignUpButtonClicked(object sender, EventArgs e) => await OpenNewUserSignUpPage();
 
         void HandleLoginApproved(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
+            MainThread.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
 
         void HandleNoCameraDetected(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Unavailable", "OK"));
+            MainThread.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Unavailable", "OK"));
     }
 }

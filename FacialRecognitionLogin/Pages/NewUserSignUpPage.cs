@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
 
@@ -110,7 +110,8 @@ namespace FacialRecognitionLogin
                 Padding = new Thickness(20, 50, 20, 20),
                 VerticalOptions = LayoutOptions.FillAndExpand,
 
-                Children ={
+                Children =
+                {
                     new Label
                     {
                         Text = "Please enter username",
@@ -170,7 +171,7 @@ namespace FacialRecognitionLogin
 
         void HandleSaveSuccessfullyCompleted(object sender, EventArgs e)
         {
-            Device.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 await DisplayAlert("Success", "New User Created", "OK");
                 await Navigation.PopModalAsync();
@@ -178,12 +179,12 @@ namespace FacialRecognitionLogin
         }
 
         void HandleSaveFailed(object sender, string errorMessage) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
+            MainThread.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
 
         void HandleCancelButtonClicked(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await Navigation.PopModalAsync());
+            MainThread.BeginInvokeOnMainThread(async () => await Navigation.PopModalAsync());
 
         void HandleTakePhotoFailed(object sender, string errorMessage) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
+            MainThread.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", errorMessage, "OK"));
     }
 }

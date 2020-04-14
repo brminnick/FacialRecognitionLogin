@@ -59,18 +59,17 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="Xam.Plugin.Media" Version="4.0.1.5" />
+        <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
         <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.5.0-preview.1" />
-        <PackageReference Include="Xamarin.Forms" Version="4.5.0.187-pre2" />
-        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="4.1.0-pre2" />
-        <PackageReference Include="Xamarin.Essentials" Version="1.4.0-pre2" />
+        <PackageReference Include="Xamarin.Forms" Version="4.6.0.616-pre4" />
+        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="4.1.1-pre1" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
     </ItemGroup>
     <ItemGroup>
         <Compile Include="MainActivity.cs" />
         <Compile Include="Resources\Resource.designer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="CustomRenderers\StyledEntryRenderer.cs" />
-        <Compile Include="CustomRenderers\FontAwesomeIconRenderer.cs" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Resources\AboutResources.txt" />
@@ -99,9 +98,6 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="CustomRenderers\" />
-    </ItemGroup>
-    <ItemGroup>
-        <AndroidAsset Include="Assets\FontAwesome.ttf" />
     </ItemGroup>
     <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

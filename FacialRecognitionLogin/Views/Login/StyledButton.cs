@@ -1,5 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
+using Xamarin.Forms.Markup;
 
 namespace FacialRecognitionLogin
 {
@@ -18,6 +19,8 @@ namespace FacialRecognitionLogin
             FontSize = 18;
             Opacity = opacity;
             FontFamily = FontConstants.DefaultFontFamily;
+
+            this.FillExpand();
 
             switch (border)
             {

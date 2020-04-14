@@ -1,8 +1,5 @@
 ﻿using System;
-
-using Plugin.Permissions;
-
-using Xamarin.Forms;
+using Xamarin.Essentials;
 
 namespace FacialRecognitionLogin
 {
@@ -10,22 +7,22 @@ namespace FacialRecognitionLogin
     {
         protected BaseMediaContentPage()
         {
-            PhotoService.PermissionsDenied += HandlePermissionsDenied;
-            PhotoService.NoCameraDetected += HandleNoPhotoDetected;
+            MediaService.PermissionsDenied += HandlePermissionsDenied;
+            MediaService.NoCameraDetected += HandleNoPhotoDetected;
         }
 
         void HandlePermissionsDenied(object sender, EventArgs e)
         {
-            Device.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 var isAlertAccepted = await DisplayAlert("Open Settings?", "Storage and Camera Permission Need To Be Enabled", "Ok", "Cancel");
                 if (isAlertAccepted)
-                    CrossPermissions.Current.OpenAppSettings();
+                    AppInfo.ShowSettingsUI();
             });
         }
 
         void HandleNoPhotoDetected(object sender, EventArgs e) =>
-            Device.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Not Available", "OK"));
+            MainThread.BeginInvokeOnMainThread(async () => await DisplayAlert("Error", "Camera Not Available", "OK"));
     }
 }
 
