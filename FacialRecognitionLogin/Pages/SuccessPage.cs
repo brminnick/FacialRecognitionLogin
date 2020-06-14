@@ -1,6 +1,7 @@
 using System;
 
 using Xamarin.Forms;
+using Xamarin.Forms.Markup;
 
 namespace FacialRecognitionLogin
 {
@@ -13,23 +14,22 @@ namespace FacialRecognitionLogin
             Padding = GetPagePadding();
             Title = "Success";
 
-            var successLabel = new Label
-            {
-                TextColor = Color.White,
-                Text = "Login Successful"
-            };
-
-            var logoutButton = new StyledButton(Borders.Thin, 1) { Text = "Logout" };
-            logoutButton.Clicked += HandleLogoutButtonClicked;
-
             Content = new StackLayout
             {
                 Spacing = 35,
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center,
-                Children = {
-                    successLabel,
-                    logoutButton
+                Children =
+                {
+                    new Label
+                    {
+                        TextColor = Color.White,
+                        Text = "Login Successful"
+                    },
+                    new StyledButton(Borders.Thin, 1)
+                    {
+                        Text = "Logout"
+                    }.Invoke(button => button.Clicked += HandleLogoutButtonClicked)
                 }
             };
         }

@@ -33,7 +33,7 @@ namespace FacialRecognitionLogin.iOS
         {
             base.OnElementChanged(e);
 
-            if (e.NewElement != null && !Control.Font.FamilyName.Equals(FontConstants.DefaultFontFamily))
+            if (Control?.Font != null && e.NewElement != null && !Control.Font.FamilyName.Equals(FontConstants.DefaultFontFamily))
             {
                 var newEntry = e.NewElement;
 

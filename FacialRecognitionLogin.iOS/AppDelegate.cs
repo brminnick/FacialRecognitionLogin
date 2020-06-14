@@ -33,13 +33,16 @@ namespace FacialRecognitionLogin.iOS
 
         void AddBlurOverlay()
         {
-            using var blurEffect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light);
-            _blurWindow = new UIVisualEffectView(blurEffect)
+            if (UIApplication.SharedApplication?.KeyWindow?.RootViewController?.View != null)
             {
-                Frame = UIApplication.SharedApplication.KeyWindow.RootViewController.View.Bounds
-            };
+                using var blurEffect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light);
+                _blurWindow = new UIVisualEffectView(blurEffect)
+                {
+                    Frame = UIApplication.SharedApplication.KeyWindow.RootViewController.View.Bounds
+                };
 
-            UIApplication.SharedApplication.KeyWindow.RootViewController.View.AddSubview(_blurWindow);
+                UIApplication.SharedApplication.KeyWindow.RootViewController.View.AddSubview(_blurWindow);
+            }
         }
 
         void RemoveBlurOverlay()

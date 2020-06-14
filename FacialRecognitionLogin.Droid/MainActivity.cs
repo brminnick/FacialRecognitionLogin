@@ -22,11 +22,11 @@ namespace FacialRecognitionLogin.Droid
             base.OnCreate(savedInstanceState);
 
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState); 
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
 
             LoadApplication(new App());
 
-            Window.SetFlags(Android.Views.WindowManagerFlags.Secure, Android.Views.WindowManagerFlags.Secure);
+            Window?.SetFlags(Android.Views.WindowManagerFlags.Secure, Android.Views.WindowManagerFlags.Secure);
         }
     }
 }
