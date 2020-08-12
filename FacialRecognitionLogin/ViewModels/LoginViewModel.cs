@@ -78,9 +78,9 @@ namespace FacialRecognitionLogin
         }
 
         void OnLoginFailed(string errorMessage, bool shouldDisplaySignUpPrompt) =>
-            _loginFailedEventManager.HandleEvent(this, new LoginFailedEventArgs(errorMessage, shouldDisplaySignUpPrompt), nameof(LoginFailed));
+            _loginFailedEventManager.RaiseEvent(this, new LoginFailedEventArgs(errorMessage, shouldDisplaySignUpPrompt), nameof(LoginFailed));
 
         void OnLoginApproved() =>
-            _loginApprovedEventManager.HandleEvent(this, EventArgs.Empty, nameof(LoginApproved));
+            _loginApprovedEventManager.RaiseEvent(this, EventArgs.Empty, nameof(LoginApproved));
     }
 }

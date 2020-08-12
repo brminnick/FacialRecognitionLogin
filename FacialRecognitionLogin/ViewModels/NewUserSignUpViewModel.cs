@@ -119,12 +119,12 @@ namespace FacialRecognitionLogin
         bool IsUsernamePasswordValid(string username, string password) => string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password);
 
         void OnTakePhotoFailed(string errorMessage) =>
-            _takePhotoFailedEventManager.HandleEvent(this, errorMessage, nameof(TakePhotoFailed));
+            _takePhotoFailedEventManager.RaiseEvent(this, errorMessage, nameof(TakePhotoFailed));
 
         void OnSaveFailed(string errorMessage) =>
-            _saveFailedEventManager.HandleEvent(this, errorMessage, nameof(SaveFailed));
+            _saveFailedEventManager.RaiseEvent(this, errorMessage, nameof(SaveFailed));
 
         void OnSaveSuccessfullyCompleted() =>
-            _saveSuccessfullyCompletedEventManager.HandleEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
+            _saveSuccessfullyCompletedEventManager.RaiseEvent(this, EventArgs.Empty, nameof(SaveSuccessfullyCompleted));
     }
 }

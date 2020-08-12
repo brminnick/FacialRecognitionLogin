@@ -40,6 +40,6 @@ namespace FacialRecognitionLogin
         }
 
         void OnPropertyChanged([CallerMemberName] in string propertyName = "") =>
-            _notifyPropertyChangedEventManager?.HandleEvent(this, new PropertyChangedEventArgs(propertyName), nameof(INotifyPropertyChanged.PropertyChanged));
+            _notifyPropertyChangedEventManager?.RaiseEvent(this, new PropertyChangedEventArgs(propertyName), nameof(INotifyPropertyChanged.PropertyChanged));
     }
 }
