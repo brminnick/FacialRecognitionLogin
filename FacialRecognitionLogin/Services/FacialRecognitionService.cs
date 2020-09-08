@@ -76,7 +76,7 @@ namespace FacialRecognitionLogin
                 var personGroupListTask = FaceApiClient.PersonGroupPerson.ListAsync(_personGroupId);
 
                 var facesDetected = await FaceApiClient.Face.DetectWithStreamAsync(photo).ConfigureAwait(false);
-                var faceDetectedIds = facesDetected.Select(x => x.FaceId ?? new Guid()).ToArray();
+                var faceDetectedIds = facesDetected.Select(x => x.FaceId).ToList();
 
                 var facesIdentified = await FaceApiClient.Face.IdentifyAsync(faceDetectedIds, _personGroupId).ConfigureAwait(false);
 
