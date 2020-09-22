@@ -63,7 +63,8 @@ namespace FacialRecognitionLogin
                 }
                 else
                 {
-                    var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, mediaFile.GetStream()).ConfigureAwait(false);
+                    var imageStream = await mediaFile.OpenReadAsync().ConfigureAwait(false);
+                    var isFaceRecognized = await FacialRecognitionService.IsFaceIdentified(usernameEntryText, imageStream).ConfigureAwait(false);
 
                     if (isFaceRecognized)
                         OnLoginApproved();

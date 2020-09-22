@@ -74,7 +74,9 @@ namespace FacialRecognitionLogin
 
             try
             {
-                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, mediaFile.GetStream()).ConfigureAwait(false);
+                var imageStream = await mediaFile.OpenReadAsync().ConfigureAwait(false);
+
+                _facialRecognitionUserGUID = await FacialRecognitionService.AddNewFace(username, imageStream).ConfigureAwait(false);
                 FontAwesomeLabelText = FontAwesomeIcon.CheckedBox.ToString();
             }
             catch (Exception e)

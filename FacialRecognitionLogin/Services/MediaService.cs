@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AsyncAwaitBestPractices;
-using Plugin.Media;
-using Plugin.Media.Abstractions;
 using Xamarin.Essentials;
 
 namespace FacialRecognitionLogin
@@ -23,10 +21,8 @@ namespace FacialRecognitionLogin
             remove => _permissionsDeniedEventManager.RemoveEventHandler(value);
         }
 
-        public static async Task<MediaFile?> GetMediaFileFromCamera()
+        public static async Task<FileResult?> GetMediaFileFromCamera()
         {
-            await CrossMedia.Current.Initialize().ConfigureAwait(false);
-
             var arePermissionsGranted = await ArePermissionsGranted().ConfigureAwait(false);
             if (!arePermissionsGranted)
             {
@@ -34,20 +30,7 @@ namespace FacialRecognitionLogin
                 return null;
             }
 
-            if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
-            {
-                OnNoCameraDetected();
-                return null;
-            }
-
-            return await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                return CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
-                {
-                    PhotoSize = PhotoSize.Small,
-                    DefaultCamera = CameraDevice.Front,
-                });
-            }).ConfigureAwait(false);
+            return await MainThread.InvokeOnMainThreadAsync(() => MediaPicker.CapturePhotoAsync()).ConfigureAwait(false);
         }
 
         static Task<bool> ArePermissionsGranted() => MainThread.InvokeOnMainThreadAsync(async () =>
