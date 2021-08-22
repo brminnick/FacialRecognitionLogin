@@ -1,3 +1,4 @@
+[![Mobile](https://github.com/brminnick/FacialRecognitionLogin/actions/workflows/mobile.yml/badge.svg)](https://github.com/brminnick/FacialRecognitionLogin/actions/workflows/mobile.yml)
 # Facial Recognition Login
 
 An iOS and Android app that uses facial recognition to provide 2-factor authentication for a login page. 
