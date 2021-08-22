@@ -27,6 +27,15 @@ namespace FacialRecognitionLogin
 
             _logo = new Image { Source = "xamarin_logo" };
 
+            _passwordEntry = new StyledEntry
+            {
+                Placeholder = "Password",
+                IsPassword = true,
+                ReturnType = ReturnType.Done
+            };
+            _passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(LoginViewModel.PasswordEntryText));
+            _passwordEntry.SetBinding(Xamarin.Forms.Entry.ReturnCommandProperty, nameof(LoginViewModel.LoginButtonTappedCommand));
+
             _logoSlogan = new StyledLabel
             {
                 Opacity = 0,
@@ -39,15 +48,6 @@ namespace FacialRecognitionLogin
                 ReturnCommand = new Command(() => _passwordEntry.Focus())
             };
             _usernameEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(LoginViewModel.UsernameEntryText));
-
-            _passwordEntry = new StyledEntry
-            {
-                Placeholder = "Password",
-                IsPassword = true,
-                ReturnType = ReturnType.Done
-            };
-            _passwordEntry.SetBinding(Xamarin.Forms.Entry.TextProperty, nameof(LoginViewModel.PasswordEntryText));
-            _passwordEntry.SetBinding(Xamarin.Forms.Entry.ReturnCommandProperty, nameof(LoginViewModel.LoginButtonTappedCommand));
 
             _loginButton = new StyledButton(Borders.Thin) { Text = "Login" };
             _loginButton.SetBinding(IsEnabledProperty, nameof(LoginViewModel.IsInternetConnectionInactive));
