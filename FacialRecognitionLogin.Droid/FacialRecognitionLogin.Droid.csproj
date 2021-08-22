@@ -17,9 +17,6 @@
         <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
         <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
         <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a;x86_64</AndroidSupportedAbis>
-        <LangVersion>8.0</LangVersion>
-        <Nullable>enable</Nullable>
-        <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugSymbols>true</DebugSymbols>
@@ -58,12 +55,12 @@
         <Reference Include="System.Net.Http" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
-        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.6.0-preview.1" />
-        <PackageReference Include="Xamarin.Forms" Version="5.0.0.1539-pre2" />
-        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="5.0.0-pre2" />
-        <PackageReference Include="Xamarin.Essentials" Version="1.6.0-pre2" />
+        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.8.0-preview.1" />
+        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2083" />
+        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.0" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
     </ItemGroup>
     <ItemGroup>
         <Compile Include="MainActivity.cs" />

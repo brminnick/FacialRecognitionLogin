@@ -9,9 +9,6 @@
         <RootNamespace>FacialRecognitionLogin.iOS</RootNamespace>
         <AssemblyName>FacialRecognitionLogin.iOS</AssemblyName>
         <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-        <LangVersion>8.0</LangVersion>
-        <Nullable>enable</Nullable>
-        <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
         <DebugSymbols>true</DebugSymbols>
@@ -116,12 +113,12 @@
         <Compile Include="CustomRenderers\StyledEntryRenderer.cs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
-        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.6.0-preview.1" />
-        <PackageReference Include="Xamarin.Forms" Version="5.0.0.1539-pre2" />
-        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="5.0.0-pre2" />
-        <PackageReference Include="Xamarin.Essentials" Version="1.6.0-pre2" />
+        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.8.0-preview.1" />
+        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2083" />
+        <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.0" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\FacialRecognitionLogin\FacialRecognitionLogin.csproj">

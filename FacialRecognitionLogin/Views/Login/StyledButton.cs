@@ -1,6 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
-using Xamarin.Forms.Markup;
+using Xamarin.CommunityToolkit.Markup;
 
 namespace FacialRecognitionLogin
 {
@@ -34,7 +34,7 @@ namespace FacialRecognitionLogin
                     break;
 
                 default:
-                    throw new NotSupportedException($"{nameof(Borders)}.{border.ToString()} Not Supported");
+                    throw new NotSupportedException($"{nameof(Borders)}.{border} Not Supported");
             }
         }
     }

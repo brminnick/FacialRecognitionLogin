@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Xamarin.Essentials;
@@ -76,7 +75,7 @@ namespace FacialRecognitionLogin
                 var personGroupListTask = FaceApiClient.PersonGroupPerson.ListAsync(_personGroupId);
 
                 var facesDetected = await FaceApiClient.Face.DetectWithStreamAsync(photo).ConfigureAwait(false);
-                var faceDetectedIds = facesDetected.Select(x => x.FaceId).ToList();
+                var faceDetectedIds = facesDetected.Select(x => x.FaceId ?? throw new NullReferenceException()).ToList();
 
                 var facesIdentified = await FaceApiClient.Face.IdentifyAsync(faceDetectedIds, _personGroupId).ConfigureAwait(false);
 
