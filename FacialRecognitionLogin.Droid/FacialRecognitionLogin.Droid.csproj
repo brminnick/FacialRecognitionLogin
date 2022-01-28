@@ -57,8 +57,8 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
-        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.8.0-preview.1" />
-        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
+        <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.Face" Version="2.8.0-preview.2" />
+        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2337" />
         <PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.4" />
         <PackageReference Include="Xamarin.Essentials" Version="1.7.1" />
     </ItemGroup>
@@ -91,6 +91,7 @@
         <ProjectReference Include="..\FacialRecognitionLogin\FacialRecognitionLogin.csproj">
             <Project>{8121B909-FB59-458F-BD2F-764D8BAD1636}</Project>
             <Name>FacialRecognitionLogin</Name>
+            <ReferenceSourceTarget></ReferenceSourceTarget>
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>
