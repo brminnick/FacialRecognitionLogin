@@ -28,4 +28,4 @@ jobs:
           
       - name: Build Android App
         run: |                    
-          mono /Applications/Visual\ studio.app/Contents/Resources/lib/monodevelop/bin/MSBuild/Current/bin/MSBuild.dll ./FacialRecognitionLogin.Droid/FacialRecognitionLogin.Droid.csproj /verbosity:normal /p:Configuration=Release     
+          msbuild ./FacialRecognitionLogin.Droid/FacialRecognitionLogin.Droid.csproj /verbosity:normal /p:Configuration=Release     
